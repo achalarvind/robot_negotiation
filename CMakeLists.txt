@@ -81,7 +81,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES beginner_tutorials
+#  LIBRARIES robot_negotiation
 CATKIN_DEPENDS message_runtime
 #  DEPENDS system_lib
 )
@@ -95,8 +95,8 @@ CATKIN_DEPENDS message_runtime
 include_directories(include)
 
 ## Declare a cpp library
-# add_library(beginner_tutorials
-#   src/${PROJECT_NAME}/beginner_tutorials.cpp
+# add_library(robot_negotiation
+#   src/${PROJECT_NAME}/robot_negotiation.cpp
 # )
 
 ## Declare a cpp executable
@@ -104,7 +104,7 @@ add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(beginner_tutorials_node beginner_tutorials_generate_messages_cpp)
+# add_dependencies(robot_negotiation_node robot_negotiation_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(world_node
@@ -126,7 +126,7 @@ add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS beginner_tutorials beginner_tutorials_node
+# install(TARGETS robot_negotiation robot_negotiation_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -151,7 +151,7 @@ add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_beginner_tutorials.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_robot_negotiation.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

@@ -1,0 +1,3 @@
+<launch>
+  <node name="world" pkg="robot_negotiation" type="world_node" />
+</launch>

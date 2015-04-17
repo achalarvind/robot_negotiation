@@ -20,6 +20,19 @@ bool getDistance(robot_negotiation::GetDistance::Request  &req,
 	return true;
 }
 
+bool GetDistanceStochastic(robot_negotiation::GetDistance::Request  &req,
+         robot_negotiation::GetDistance::Response &res,
+         WorldMap *pWorld)
+{
+	std::random_device rd;
+	std::default_random_engine generator(rd());
+	std::poisson_distribution <int> delay (10);
+	double delay_factor=(1+(delay(generator)/100.0f));
+	ROS_INFO("delay factor is %f",delay_factor);
+	res.distance=(delay_factor*pWorld->GetDistance(req.source,req.destination));
+	return true;
+}
+
 int main(int argc, char** argv)
 {
 	//Serialization for WorldMap
@@ -41,15 +54,19 @@ int main(int argc, char** argv)
  	ros::NodeHandle n;
 
 	std::ifstream stVtxPath;
-	stVtxPath.open("G:\\Visual_Studio_Projects\\Robot_Negotiation\\Robot_Negotiation\\MapVertices.txt");
+	stVtxPath.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapVertices.txt");
 
 	std::ifstream stEdges;
-	stEdges.open("G:\\Visual_Studio_Projects\\Robot_Negotiation\\Robot_Negotiation\\MapEdges.txt");
+	stEdges.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapEdges.txt");
 
 	WorldMap *pWorld = new WorldMap(stVtxPath, stEdges);
 	pWorld->ComputeAllPairsShortestPath();
 
-	n.advertiseService<robot_negotiation::GetDistance::Request, robot_negotiation::GetDistance::Response>("get_distance", boost::bind(getDistance, _1, _2, pWorld));
+	// std::random_device rd;
+	// std::default_random_engine generator(rd());
+
+	ros::ServiceServer distance_service =n.advertiseService<robot_negotiation::GetDistance::Request, robot_negotiation::GetDistance::Response>("/get_distance", boost::bind(getDistance, _1, _2, pWorld));
+	ros::ServiceServer stochastic_distance_service =n.advertiseService<robot_negotiation::GetDistance::Request, robot_negotiation::GetDistance::Response>("/get_distance_stochastic", boost::bind(GetDistanceStochastic, _1, _2, pWorld));
     // ros::ServiceServer service = nh.advertiseService<epsilon::Pose::Request, epsilon::Pose::Response>("/epsilon/get_pose", boost::bind(&PoseServer::compute_Pose, server, _1, _2));
 
 	ROS_INFO("started_node");
