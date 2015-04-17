@@ -24,23 +24,23 @@ Edge::Edge(int iNodeID1, int iNodeID2, double Distance)
 	dDist = Distance;
 }
 
-void WorldMap::serialize(boost::archive::text_iarchive & ar, const unsigned int file_version)
-{
-	ar & m_hashWorldMap;
-	ar & m_AllPairDistances;
-}
+// void WorldMap::serialize(boost::archive::text_iarchive & ar, const unsigned int file_version)
+// {
+// 	ar & m_hashWorldMap;
+// 	ar & m_AllPairDistances;
+// }
 
-void WorldMap::serialize(boost::archive::text_oarchive & ar, const unsigned int file_version)
-{
-	ar & m_hashWorldMap;
-	ar & m_AllPairDistances;
-}
+// void WorldMap::serialize(boost::archive::text_oarchive & ar, const unsigned int file_version)
+// {
+// 	ar & m_hashWorldMap;
+// 	ar & m_AllPairDistances;
+// }
 
 WorldMap::WorldMap(std::ifstream &pstVtxPath, std::ifstream &pstEdges)
 {
 	bShortestPaths = false;
 
-	std::hash_map< double, std::pair<double, double> > obHashVtx;
+	std::unordered_map< double, std::pair<double, double> > obHashVtx;
 
 	std::string stVertexline;
 	while (std::getline(pstVtxPath, stVertexline))

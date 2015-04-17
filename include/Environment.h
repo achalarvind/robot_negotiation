@@ -81,19 +81,5 @@ class Environment
 		int GetStackHeight(Location obLoc);
 };
 
-class cBaxter
-{
-public:
-	TableState Add_Element(Environment*, Block obBlock, Location obLoc);
-	TableState Remove_Element(Environment*, Block obBlock, Location obLoc);
-};
-
-class cHuman
-{
-public:
-	TableState Add_Element(Environment*, Block obBlock, Location obLoc);
-	TableState Remove_Element(Environment*, Block obBlock, Location obLoc);
-};
-
 
 #endif

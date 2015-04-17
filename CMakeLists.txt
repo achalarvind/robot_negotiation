@@ -54,6 +54,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 add_service_files(
   FILES
   GetDistance.srv
+  GetDistanceStochastic.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -64,10 +65,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-#generate_messages(
-#  DEPENDENCIES
-#  std_msgs  # Or other packages containing msgs
-#)
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -91,7 +92,7 @@ CATKIN_DEPENDS message_runtime
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
+include_directories(include)
 
 ## Declare a cpp library
 # add_library(beginner_tutorials
@@ -99,16 +100,16 @@ CATKIN_DEPENDS message_runtime
 # )
 
 ## Declare a cpp executable
-# add_executable(beginner_tutorials_node src/beginner_tutorials_node.cpp)
+add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(beginner_tutorials_node beginner_tutorials_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(beginner_tutorials_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(world_node
+   ${catkin_LIBRARIES}
+ )
 
 #############
 ## Install ##
@@ -157,3 +158,5 @@ CATKIN_DEPENDS message_runtime
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+SET ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
