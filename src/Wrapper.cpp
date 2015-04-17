@@ -54,10 +54,10 @@ int main(int argc, char** argv)
  	ros::NodeHandle n;
 
 	std::ifstream stVtxPath;
-	stVtxPath.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapVertices.txt");
+	stVtxPath.open("../data_files/MapVertices.txt");
 
 	std::ifstream stEdges;
-	stEdges.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapEdges.txt");
+	stEdges.open("../data_files/MapEdges.txt");
 
 	WorldMap *pWorld = new WorldMap(stVtxPath, stEdges);
 	pWorld->ComputeAllPairsShortestPath();
