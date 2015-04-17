@@ -1,13 +1,25 @@
 #include "Environment.h"
 
-Block::Block(std::string str)
+Block::Block(std::string str, int iHeight , int ID)
 {
 	m_str = str;
+	m_iHeight = iHeight;
+	m_str_ID = str + std::to_string(ID);
 }
 
 std::string Block::GetName()
 {
 	return m_str;
+}
+
+std::string Block::GetID()
+{
+	return m_str_ID;
+}
+
+int Block::GetHeight()
+{
+	return m_iHeight;
 }
 
 Location::Location(int iX, int iY)
@@ -42,17 +54,22 @@ int BlockStack::GetStackSize()
 	return m_vecStackBlocks.size();
 }
 
-bool BlockStack::Get_Object_Locations(Block obBlock, Location loc, std::vector<std::pair<Location, int>> *pvecLocations)
+bool BlockStack::Get_Object_Locations(Block obBlock, Location loc, std::unordered_map<std::string , std::pair<Location, double>> *pvecLocations)
 {
 	bool bExists = false;
 
 	const int c_iStackSize = m_vecStackBlocks.size();
+	double dHeight = 0 , dCOM;
 
 	for (int iCount = 0; iCount < c_iStackSize; iCount++)
 	{
+		dHeight = dHeight + m_vecStackBlocks[iCount].GetHeight();
+
 		if (m_vecStackBlocks[iCount].GetName() == obBlock.GetName())
 		{
-			pvecLocations->push_back(std::make_pair( loc , c_iStackSize - iCount - 1) );
+			dCOM = dHeight - (m_vecStackBlocks[iCount].GetHeight() / 2.0);
+			//pvecLocations->push_back(std::make_pair(loc, dCOM));
+			pvecLocations->insert(std::make_pair(m_vecStackBlocks[iCount].GetID() , std::make_pair(loc, dCOM)));
 			bExists = bExists | true;
 		}
 	}
@@ -121,7 +138,7 @@ TableState Environment::Is_Table_Full_At_Loc(Location obLoc)
 	return TableState::NOT_FULL_AT_LOCATION;
 }
 
-TableState Environment::Add_Element(Block obBlock, Location obLoc)
+TableState Environment::Add_Element(Block obBlock, Location obLoc, double dHeight)
 {
 	boost::lock_guard<boost::mutex> guard(m_bmutex);
 
@@ -152,14 +169,14 @@ TableState Environment::Add_Element(Block obBlock, Location obLoc)
 	return TableState::OBJECT_ADDED;
 }
 
-TableState cBaxter::Add_Element(Environment* pclEnv, Block obBlock, Location obLoc)
+TableState cBaxter::Add_Element(Environment* pclEnv, Block obBlock, Location obLoc, double dHeight)
 {
-	return pclEnv->Add_Element(obBlock , obLoc);
+	return pclEnv->Add_Element(obBlock, obLoc, dHeight);
 }
 
-TableState cHuman::Add_Element(Environment* pclEnv, Block obBlock, Location obLoc)
+TableState cHuman::Add_Element(Environment* pclEnv, Block obBlock, Location obLoc, double dHeight)
 {
-	return pclEnv->Add_Element(obBlock, obLoc);
+	return pclEnv->Add_Element(obBlock, obLoc, dHeight);
 }
 
 
@@ -187,7 +204,7 @@ TableState cHuman::Remove_Element(Environment* pclEnv, Block obBlock, Location o
 	return pclEnv->Remove_Element(obBlock, obLoc);
 }
 
-bool Environment::Get_Object_Locations(Block obBlock, std::vector<std::pair<Location, int>> *pvecObjLocation)
+bool Environment::Get_Object_Locations(Block obBlock, std::unordered_map<std::string , std::pair<Location, double>> *pvecObjLocation)
 {
 	bool bObjectExists = false;
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 #include <boost/thread.hpp>
 
 class cBaxter;
@@ -13,9 +14,13 @@ class Block
 {
 	private:
 		std::string m_str;
+		std::string m_str_ID;
+		int m_iHeight;
 	public:
-		Block(std::string str);
+		Block(std::string str , int m_iHeight , int iD);
 		std::string GetName();
+		std::string GetID();
+		int GetHeight();
 };
 
 class Location
@@ -35,7 +40,7 @@ class BlockStack
 	public:
 		bool AddToStack(Block obBlock , int iCapacity);
 		int GetStackSize();
-		bool Get_Object_Locations(Block obBlock, Location loc, std::vector<std::pair<Location, int>> *pvecLocations);
+		bool Get_Object_Locations(Block obBlock, Location loc, std::unordered_map<std::string , std::pair<Location, double>> *pvecLocations);
 		bool RemoveBlock(Block block);
 };
 
@@ -74,9 +79,9 @@ class Environment
 		Environment(int iTableSize, int m_iCapacity_Per_Location);
 		~Environment();
 
-		TableState Add_Element(Block obBlock, Location obLoc);
+		TableState Add_Element(Block obBlock, Location obLoc , double dHeight);
 		TableState Remove_Element(Block obBlock, Location obLoc);
-		bool Get_Object_Locations(Block obBlock, std::vector<std::pair<Location , int>> * );
+		bool Get_Object_Locations(Block obBlock, std::unordered_map<std::string , std::pair<Location, double>> *);
 		bool Is_Table_In_Use();
 		int GetStackHeight(Location obLoc);
 };
