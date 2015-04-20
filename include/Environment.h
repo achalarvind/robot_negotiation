@@ -84,6 +84,7 @@ class Environment
 		bool Get_Object_Locations(Block obBlock, std::unordered_map<std::string , std::pair<Location, double>> *);
 		bool Is_Table_In_Use();
 		int GetStackHeight(Location obLoc);
+        static int GenerateID();
 };
 
 

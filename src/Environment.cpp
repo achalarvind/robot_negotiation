@@ -228,3 +228,9 @@ int Environment::GetStackHeight(Location obLoc)
 {
 	return m_vecTable[obLoc.GetY()][obLoc.GetX()]->GetStackSize();
 }
+
+int Environment::GenerateID()
+{
+	static int iObjectID = 0;
+	return iObjectID++;
+}
