@@ -79,13 +79,16 @@ bool BlockStack::Get_Object_Locations(Block obBlock, Location loc, std::unordere
 
 bool BlockStack::RemoveBlock(Block obBlock)
 {
-	if (m_vecStackBlocks[m_vecStackBlocks.size() - 1].GetName() != obBlock.GetName())
+	for (std::vector<Block>::iterator it = m_vecStackBlocks.begin(); it != m_vecStackBlocks.end(); it++)
 	{
-		return false;
+		if (it->GetName() == obBlock.GetName())
+		{
+			m_vecStackBlocks.erase(it);
+			return true;
+		}
 	}
 
-	m_vecStackBlocks.pop_back();
-	return true;
+	return false;
 }
 
 Environment::Environment(FILE *pFile)
