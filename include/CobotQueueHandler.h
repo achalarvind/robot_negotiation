@@ -1,26 +1,25 @@
-#include <Environment>
 #include "ros/ros.h"
 
 class cobotQueue{	
 	private:
-		ros::NodeHandle nh;
-		ros::Publisher cobotQueuePub; //publishes number of Cobots in queue, among possibly other things
+		//ros::NodeHandle nh;
+		//ros::Publisher cobotQueuePub; //publishes number of Cobots in queue, among possibly other things
 		std::vector<uint> cobotIds; //a list of the ID's of Cobot in queue
 
 	public:
 
 		cobotQueue(std::vector<uint> ids);
 
-		uint getQueueSize();
+		uint get_queue_size();
 		
-		bool addCobot();
+		bool add_cobot(uint id);
 		
-		bool removeCobot();
+		bool remove_cobot(uint id);
 
-		bool initiateVote();
+		bool initiate_vote();
 
-		bool collectVotes();
+		bool collect_votes();
 
-		bool sendBestPlan();
+		bool send_best_plan();
 
 };	

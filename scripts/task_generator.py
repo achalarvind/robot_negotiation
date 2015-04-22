@@ -10,8 +10,8 @@ horizon = 100 #units of time for which we are running the simulation
 avSpeed = 10 #Cobot average speed used for task duration information
 nCobots = 3
 maxSubLengthFactor = 5 #maximum ratio of tasks which will be assigned to the same deadline
-fnV = "../../maps/" #vertices path
-fnO = "../../" #objects path
+fnV = "../data_files/" #vertices path
+fnO = "../data_files/" #objects path
 
 # Load vertices
 vfn = os.path.join(os.path.dirname(fnV), "MapVertices.dat")
