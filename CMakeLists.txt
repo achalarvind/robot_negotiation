@@ -47,8 +47,8 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  task.msg
-  task_list.msg
+  Task.msg
+  TaskList.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -56,6 +56,7 @@ add_service_files(
   FILES
   GetDistance.srv
   GetDistanceStochastic.srv
+  GetTasks.srv
 )
 
 ## Generate actions in the 'action' folder

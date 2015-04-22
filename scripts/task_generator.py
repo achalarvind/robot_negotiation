@@ -1,10 +1,16 @@
-PKG_NAME = 'cobot'
+#!/usr/bin/python
+
+# PKG_NAME = 'cobot'
 #import roslib; roslib.load_manifest(PKG_NAME)
+
 import rospy
 from random import *
 from std_msgs.msg import *
 import os
 from math import *
+
+from robot_negotiation.srv import *
+from robot_negotiation.msg import *
 
 horizon = 100 #units of time for which we are running the simulation
 avSpeed = 10 #Cobot average speed used for task duration information
@@ -75,7 +81,6 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 		t.est_time = est_time
 		task_list.append(t)
 
-
 	#set deadlines
 	cursor = 0 #a cursor on task index
 	project_length = 0 #stores minimum time to complete so far
@@ -94,13 +99,37 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 		cursor += subset
 		#print cursor
 
-	return task_list	
+	return task_list
 
-if __name__ == '__main__':
-	task_lists = []
-	for i in xrange(0,nCobots):
-		task_list = generate_tasks()
-		task_lists.append(task_list)
-		print "Cobot" + str(i)
-		for j in xrange(0,len(task_list)):
-			print "Object:"+str(olist[task_list[j].object_id])+" Location:"+str(task_list[j].location)+" Est time:"+str(task_list[j].est_time)+" Deadline:"+str(task_list[j].deadline)
+def generate_tasks_handler(req):
+	tasks=generate_tasks()
+	task_list=TaskList()
+	for i in xrange(len(tasks)):
+		t = Task()
+		t.task_id = tasks[i].object_id
+		t.destination = tasks[i].location
+		t.est_time = tasks[i].est_time
+		t.deadline = tasks[i].deadline
+		task_list.task_list.append(t)
+
+	return GetTasksResponse(task_list)	
+
+
+
+# if __name__ == '__main__':
+# 	task_lists = []
+# 	for i in xrange(0,nCobots):
+# 		task_list = generate_tasks()
+# 		task_lists.append(task_list)
+# 		print "Cobot" + str(i)
+# 		for j in xrange(0,len(task_list)):
+# 			print "Object:"+str(olist[task_list[j].object_id])+" Location:"+str(task_list[j].location)+" Est time:"+str(task_list[j].est_time)+" Deadline:"+str(task_list[j].deadline)
+
+def add_two_ints_server():
+    rospy.init_node('task_server')
+    s = rospy.Service('task_generator', GetTasks, generate_tasks_handler)
+    print "Ready to generate tasks"
+    rospy.spin()
+
+if __name__ == "__main__":
+    add_two_ints_server()

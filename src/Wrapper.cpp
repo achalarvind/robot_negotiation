@@ -10,7 +10,6 @@
 #include "robot_negotiation/GetDistance.h"
 // #include "robot_negotiation/GetDistanceStochastic.h"
 #include <CobotQueueHandler.h>
-#include <test.cpp>
 
 using namespace std;
 
