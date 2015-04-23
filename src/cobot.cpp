@@ -10,6 +10,9 @@ ccobot::ccobot(){
 	{
 		ROS_ERROR("Failed to call service get services");
 	}	
+
+	// ros::ServiceServer distance_service =nh.advertiseService<robot_negotiation::GetDistance::Request, robot_negotiation::GetDistance::Response>("/get_distance", boost::bind(getDistance, _1, _2, pWorld));
+
 }
 
 int main(int argc, char **argv){
