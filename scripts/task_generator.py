@@ -16,11 +16,21 @@ horizon = 100 #units of time for which we are running the simulation
 avSpeed = 10 #Cobot average speed used for task duration information
 nCobots = 3
 maxSubLengthFactor = 5 #maximum ratio of tasks which will be assigned to the same deadline
-fnV = "../data_files/" #vertices path
-fnO = "../data_files/" #objects path
+
+os.chdir('..')
+path=os.path.split(os.path.realpath(__file__))
+path=path[0]
+fnV=os.path.join(path,'../data_files') #vertices path
+print fnV
+fn0 = os.path.join(path,'../data_files') #objects path
+waitingNode = 16; #GHC6
+
+
+get_distance = rospy.ServiceProxy('get_distance', GetDistance)
 
 # Load vertices
-vfn = os.path.join(os.path.dirname(fnV), "MapVertices.dat")
+vfn = os.path.join(fnV ,"MapVertices.dat")
+print vfn
 vdict = {}
 rsz = struct.calcsize("3d")
 
@@ -34,7 +44,7 @@ with open(vfn) as fh:
 print "Loaded MapVertices.dat"
 
 # Load object inventory
-ofn = os.path.join(os.path.dirname(fnO), "objects.txt")
+ofn = os.path.join(fnV, "objects.txt")
 olist = []
 with open(ofn) as fh:
     while True:
@@ -71,8 +81,9 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	while True:
 		object_id = randint(0,nObjects-1)
 		location = vKeys[randint(0,nVertices-1)]
-		#get the estimated task execution time (for now Euclidean distance from reference point (0,0))
-		est_time = 2*sqrt(vdict[location][1]*vdict[location][1] + vdict[location][0]*vdict[location][0])/avSpeed
+		#get the estimated task execution time (for now Euclidean distance from reference point
+		est_time = 2*get_distance(location,waitingNode)/avSpeed
+		print(est_time)
 		totalTime += est_time
 		if totalTime > horizon: break
 		t = task()
