@@ -1,0 +1,98 @@
+#ifndef CSPSOLVER_H	   
+#define CSPSOLVER_H
+
+#include "Environment.h"
+
+class TaskInfo
+{
+	public:
+		double m_dTaskDeadline;
+		Block m_obBlock;
+		int m_iCobotNum;
+
+		TaskInfo(double, Block, int);
+};
+
+enum class SOLUTION
+{
+	TIME_IN, TIME_OUT , INFEASIBLE
+};
+
+class DeliveryOrderSeq
+{
+	public:
+		int m_iCobotNum;
+		std::string m_strLoc;
+		double m_dExpectedTime;
+		double m_dDeadLine;
+
+		DeliveryOrderSeq(int , std::string , double , double);
+};
+
+class PickUpOrderSeqInfo
+{
+	public:
+		int m_iTableNum;
+		Location m_obLoc;
+		std::string m_strObjectName;
+		double m_dPickUpTime;
+
+		PickUpOrderSeqInfo(int, Location, std::string , double);
+};
+
+class CompleteSeqInfo
+{
+	public:
+		int m_iCobotNum;
+		int m_iObjectPickUpLocation;
+		int m_iDropOffLocation;
+		double m_dPickUpTime;
+		double m_dDeadline;
+
+		CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime);
+};
+
+class CSPSolver
+{
+	private:
+
+		const int m_c_iStartLocation;
+		const double m_c_dStartTime, m_c_Solver_Time_Out_Feasible, m_c_Solver_Time_Out_In_Feasible;
+		bool m_bFeasibility;
+
+		std::vector<DeliveryOrderSeq> m_vecCobotOrder;
+		std::vector<PickUpOrderSeqInfo> m_vecPickUpObjectOrder;
+		std::unordered_map<int, CompleteSeqInfo> m_umapCompleteSeqInfo;
+		std::unordered_map<double, std::vector<DeliveryOrderSeq>> m_umap_Candidates;
+
+		std::vector<TaskInfo> m_vecTasks;
+		std::vector<Environment> m_vecEnvironments;
+		EnvironmentGeometry m_obGeometry;
+
+		std::string ReturnDropOfLocation(int iLoc);
+		int ReturnDropOfLocation(std::string stLoc);
+
+		void Perform3Swap();
+
+		std::pair<bool, SOLUTION> TraverseGraph(int iCobotCount, int iCurrLoc, double dCurrentTime);
+		std::pair<bool, SOLUTION> SelectPickUpLocation(Block obBlock, int iCobotCount, int iCurrLoc, double dCurrentTime);
+		std::pair<bool, SOLUTION> SelectDeliveryLocation(int iCobotCount, int iCurrLoc, Location obLoc, double dCurrentTime); //Location here is the location at which object was picked up
+		
+		void CheckForLocalImprovement(std::vector<int> vecRandom, std::vector<int> vecShuffle , std::vector<DeliveryOrderSeq>* pvecDeliverySequence);
+		void PopulateSequenceInfo();
+		void InsertSequenceIntoCandidatePool(double, std::vector<DeliveryOrderSeq>);
+
+	public:
+
+		CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, double dTime_Out_2, EnvironmentGeometry obGeometry);
+		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>, std::vector<Environment*> , bool);
+
+		typedef std::pair<std::pair<int , double>, std::pair<double, Location >> PickUpTime;
+		typedef std::pair<int, std::pair<double, int >> DeliveryTime;
+		
+		//Needs to be changed with ROS time
+		double ReturnCurrentTime();
+
+};
+
+#endif
