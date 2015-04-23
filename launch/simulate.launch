@@ -1,3 +1,5 @@
 <launch>
   <node name="world" pkg="robot_negotiation" type="world_node" />
+  <node name="task_generator" pkg="robot_negotiation" type="task_generator.py" />
+  <node name="cobot_node" pkg="robot_negotiation" type="cobot_node" />
 </launch>

@@ -106,7 +106,7 @@ def generate_tasks_handler(req):
 	task_list=TaskList()
 	for i in xrange(len(tasks)):
 		t = Task()
-		t.task_id = tasks[i].object_id
+		t.object_id = tasks[i].object_id
 		t.destination = tasks[i].location
 		t.est_time = tasks[i].est_time
 		t.deadline = tasks[i].deadline

@@ -103,6 +103,7 @@ include_directories(include)
 
 ## Declare a cpp executable
 add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
+add_executable(cobot_node src/cobot.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -110,6 +111,10 @@ add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(world_node
+   ${catkin_LIBRARIES}
+ )
+
+target_link_libraries(cobot_node
    ${catkin_LIBRARIES}
  )
 
