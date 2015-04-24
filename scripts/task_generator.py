@@ -27,7 +27,6 @@ waitingNode = 16; #GHC6
 
 
 get_distance = rospy.ServiceProxy('get_distance', GetDistance)
-
 # Load vertices
 vfn = os.path.join(fnV ,"MapVertices.dat")
 print vfn
@@ -75,15 +74,20 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	global nVertices
 	global nObjects
 
+
+
 	totalTime = 0
 	task_list = []
 
 	while True:
+		# print("distance is",get_distance(int(42),int(waitingNode)))
+
 		object_id = randint(0,nObjects-1)
 		location = vKeys[randint(0,nVertices-1)]
 		#get the estimated task execution time (for now Euclidean distance from reference point
-		est_time = 2*get_distance(location,waitingNode)/avSpeed
-		print(est_time)
+		# distance=get_distance(int(location),int(waitingNode))
+		distance=100
+		est_time = 2*distance/avSpeed
 		totalTime += est_time
 		if totalTime > horizon: break
 		t = task()
@@ -114,6 +118,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 
 def generate_tasks_handler(req):
 	tasks=generate_tasks()
+	print "service called"
 	task_list=TaskList()
 	for i in xrange(len(tasks)):
 		t = Task()

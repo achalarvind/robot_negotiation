@@ -8,7 +8,7 @@ ccobot::ccobot(){
 	}
 	else
 	{
-		ROS_ERROR("Failed to call service get services");
+		ROS_ERROR("Failed to call service task_generator");
 	}	
 
 	// ros::ServiceServer distance_service =nh.advertiseService<robot_negotiation::GetDistance::Request, robot_negotiation::GetDistance::Response>("/get_distance", boost::bind(getDistance, _1, _2, pWorld));
