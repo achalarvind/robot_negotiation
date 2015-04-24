@@ -3,6 +3,9 @@
 #include <chrono>
 #include "Constants.h"
 #include <iostream>
+#include<conio.h>
+
+#define LARGE_TREE   
 
 using namespace std;
 
@@ -81,6 +84,12 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 
 	m_vecTasks = vecCobotTasks;
 	
+	//Initialize variables
+	for (unsigned int iCount = 0; iCount < m_vecTasks.size(); iCount++)
+	{
+		m_Assigned_Cobots.push_back(false);
+	}
+	
 	//Sort by MCV heurisitc - deadlines are used here
 	std::sort(m_vecTasks.begin(), m_vecTasks.end(), MCV_Deadline_Heurisitc);
 
@@ -96,12 +105,27 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 		m_vecEnvironments.push_back(*(vecptrEnvironments[iCount]) );
 	}
 
-	std::pair<bool, SOLUTION> stSol = TraverseGraph(0, m_c_iStartLocation , m_c_dStartTime);
+#ifdef LARGE_TREE
+	std::pair<bool, SOLUTION> stSol = SelectNode(m_c_iStartLocation, m_c_dStartTime);
+#else
+	std::pair<bool, SOLUTION> stSol = TraverseGraph(0 , m_c_iStartLocation, m_c_dStartTime);
+#endif
 
 	if (false == stSol.first)
 	{
 		m_bFeasibility = false;
-		stSol = TraverseGraph(0, m_c_iStartLocation , m_c_dStartTime);
+
+		//Initialize variables
+		for (unsigned int iCount = 0; iCount < m_vecTasks.size(); iCount++)
+		{
+			m_Assigned_Cobots[iCount] = false;
+		}
+
+#ifdef LARGE_TREE
+		stSol = SelectNode(m_c_iStartLocation, m_c_dStartTime);
+#else
+		stSol = TraverseGraph(0, m_c_iStartLocation, m_c_dStartTime);
+#endif
 	}
 
 	PopulateSequenceInfo();
@@ -120,14 +144,72 @@ CSPSolver::CSPSolver(std::string strStartLocation, double dStartTime, double dTi
 	m_bFeasibility = true;
 }
 
+int CSPSolver::Return_MCV_Cobot(std::vector<int>* pvecVals)
+{
+	std::vector<int>::iterator it;
+
+	for (unsigned int iCount = 0; iCount < m_Assigned_Cobots.size(); iCount++)
+	{
+		if (true == m_Assigned_Cobots[iCount]) { continue; }
+
+		it = std::find(pvecVals->begin(), pvecVals->end(), iCount);
+
+		if (it != pvecVals->end()) { continue; }
+
+		return iCount;
+	}
+
+	return -1;
+}
+
+
+std::pair<bool, SOLUTION> CSPSolver::SelectNode(int iCurrLoc, double dCurrentTime)
+{
+	int iCobotIndex;
+	std::pair<bool, SOLUTION> stSol;
+	std::vector<int> vecPrevtriedValues;
+
+	for (unsigned int iCount = 0; iCount < m_vecTasks.size(); iCount++)
+	{
+		if (true == CheckIfAllVarsInitialized())
+		{
+			return std::make_pair(true, SOLUTION::TIME_IN);
+		}
+
+		iCobotIndex = Return_MCV_Cobot(&(vecPrevtriedValues));
+
+		//cout << iCobotIndex << "\n";
+
+		if (-1 == iCobotIndex)
+		{
+			return std::make_pair(false, SOLUTION::TIME_IN);
+		}
+		
+		vecPrevtriedValues.push_back(iCobotIndex);
+
+		m_Assigned_Cobots[iCobotIndex] = true;
+
+		stSol = TraverseGraph(iCobotIndex, iCurrLoc, dCurrentTime);
+		
+		if ((true == stSol.first) || (SOLUTION::TIME_OUT == stSol.second) || (SOLUTION::INFEASIBLE == stSol.second))
+		{
+			return stSol;
+		}
+
+		m_Assigned_Cobots[iCobotIndex] = false;
+	}
+
+	return std::make_pair(false, SOLUTION::TIME_IN);
+}
+
 std::pair<bool, SOLUTION> CSPSolver::TraverseGraph(int iCobotIndex, int iCurrLoc, double dCurrentTime)
 {
-	if (iCobotIndex == m_vecTasks.size())
+#ifndef LARGE_TREE
+	if(iCobotIndex == m_vecTasks.size())
 	{
 		return std::make_pair(true, SOLUTION::TIME_IN);
 	}
-
-	cout << iCobotIndex << "\n";
+#endif
 
 	std::pair<bool, SOLUTION> stSol;
 
@@ -198,18 +280,16 @@ std::pair<bool, SOLUTION> CSPSolver::SelectPickUpLocation(Block obBlock, int iCo
 		
 		m_vecEnvironments[iEnvNum].Remove_Element(obBlock, vecLocations[iCount].second.second);
 
+		m_vecPickUpObjectOrder.push_back(PickUpOrderSeqInfo(iEnvNum, vecLocations[iCount].second.second, obBlock.GetID(), dPickUpTime));
+
 		stSol = SelectDeliveryLocation(iCobotIndex, iEnvNum, vecLocations[iCount].second.second, vecLocations[iCount].second.first);
 
-		if (true == stSol.first)
-		{
-			m_vecPickUpObjectOrder.push_back(PickUpOrderSeqInfo(iEnvNum, vecLocations[iCount].second.second, obBlock.GetID(), dPickUpTime));
-			return stSol;
-		}
-		else if ((SOLUTION::TIME_OUT == stSol.second) || (SOLUTION::INFEASIBLE == stSol.second))
+		if ((true == stSol.first) || (SOLUTION::TIME_OUT == stSol.second) || (SOLUTION::INFEASIBLE == stSol.second) )
 		{
 			return stSol;
 		}
-
+		
+		m_vecPickUpObjectOrder.pop_back();
 		m_vecEnvironments[iEnvNum].Add_Element(obBlock, vecLocations[iCount].second.second);
 	}
 
@@ -250,8 +330,12 @@ std::pair<bool, SOLUTION> CSPSolver::SelectDeliveryLocation(int iCobotIndex, int
 		double dTimeDelivery = vecDeliveryLocations[iCount].second.first;		
 
 		m_vecCobotOrder.push_back(DeliveryOrderSeq(m_vecTasks[iCobotIndex].m_iCobotNum, stDropOffLoc, dTimeDelivery, dDeadline));
-		
+
+#ifdef LARGE_TREE
+		stSol = SelectNode(iDropOffLoc, dTimeDelivery);
+#else
 		stSol = TraverseGraph(iCobotIndex + 1, iDropOffLoc, dTimeDelivery);
+#endif
 
 		if ((true == stSol.first) || (SOLUTION::TIME_OUT == stSol.second) || (SOLUTION::INFEASIBLE == stSol.second))
 		{
@@ -267,7 +351,25 @@ std::pair<bool, SOLUTION> CSPSolver::SelectDeliveryLocation(int iCobotIndex, int
 void CSPSolver::Perform3Swap()
 {
 	int iNumOfCobots = m_vecCobotOrder.size();
-	InsertSequenceIntoCandidatePool(m_vecCobotOrder[iNumOfCobots - 1].m_dExpectedTime, m_vecCobotOrder);
+
+	if (m_bFeasibility)
+	{
+		InsertSequenceIntoCandidatePool(m_vecCobotOrder[iNumOfCobots - 1].m_dExpectedTime, m_vecCobotOrder);
+	}
+	else
+	{
+		double dFeasibleCobots = 0;
+
+		for (unsigned int iCount = 0; iCount < m_vecCobotOrder.size(); iCount++)
+		{
+			if (m_vecCobotOrder[iCount].m_dExpectedTime <= m_vecCobotOrder[iCount].m_dDeadLine) 
+			{
+				dFeasibleCobots = dFeasibleCobots + 1.0;
+			}
+		}
+
+		InsertSequenceIntoCandidatePool( -1 * dFeasibleCobots , m_vecCobotOrder);
+	}
 
 	if (1 == iNumOfCobots)
 	{
@@ -276,7 +378,7 @@ void CSPSolver::Perform3Swap()
 
 	std::vector<DeliveryOrderSeq> vecNewSequence;
 
-	for (int iCount = 0; iCount < m_vecCobotOrder.size(); iCount++)
+	for (unsigned int iCount = 0; iCount < m_vecCobotOrder.size(); iCount++)
 	{
 		vecNewSequence.push_back(m_vecCobotOrder[iCount]);
 	}
@@ -284,6 +386,7 @@ void CSPSolver::Perform3Swap()
 	std::vector<DeliveryOrderSeq> vecCombinations[6];
 		
 	unsigned int iMaxIterations;
+	double dBestSol;
 
 	if (iNumOfCobots > 15)
 	{
@@ -313,13 +416,12 @@ void CSPSolver::Perform3Swap()
 			vecRandomIntegers = GenerateRandomNumbers(iNumOfCobots, iNumOfCobots);
 			iPermutations = 2;
 		}
-
 		
 		for (int iCombination = 0; iCombination < iPermutations; iCombination++)
 		{
 			vecCombinations[iCombination].clear();
 
-			for (int iCount = 0; iCount < vecNewSequence.size(); iCount++)
+			for (unsigned int iCount = 0; iCount < vecNewSequence.size(); iCount++)
 			{
 				vecCombinations[iCombination].push_back(vecNewSequence[iCount]);
 			}
@@ -328,6 +430,9 @@ void CSPSolver::Perform3Swap()
 
 			CheckForLocalImprovement(vecRandomIntegers, vecSwapIndices, &vecCombinations[iCombination]);
 		}
+
+		dBestSol = ReturnKeyOfBestCandidate();
+		vecNewSequence = m_umap_Candidates.find(dBestSol)->second;
 	}
 
 }
@@ -374,6 +479,7 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 	int iPickUpLocation;
 
 	double dTime = m_c_dStartTime;
+	double dFeassibleCobots = 0;
 
 	for (unsigned int iCount = 0; iCount < vecDelivery.size(); iCount++)
 	{
@@ -385,9 +491,13 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 
 		dTime = dTime + (it->second.m_dPickUpTime) + m_obGeometry.ReturnTravDistance(iBaxterStartLocation, iPickUpLocation) + m_obGeometry.ReturnTravDistance(iPickUpLocation, iDeliveryLocation);
 
-		if ((dTime > it->second.m_dDeadline) && m_bFeasibility)
+		if (m_bFeasibility)
 		{
-			return;
+			if (dTime > it->second.m_dDeadline) { return; }
+		}
+		else
+		{
+			dFeassibleCobots = dFeassibleCobots + 1.0;
 		}
 
 		vecDelivery[iCount].m_dExpectedTime = dTime;  // Updates the delivery time of this sequence
@@ -395,7 +505,14 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 		iBaxterStartLocation = iDeliveryLocation;
 	}
 
-	InsertSequenceIntoCandidatePool(dTime, vecDelivery);
+	if (m_bFeasibility)
+	{
+		InsertSequenceIntoCandidatePool(dTime, vecDelivery);
+	}
+	else
+	{
+		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, vecDelivery);
+	}
 }
 
 void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<DeliveryOrderSeq> vecDelivery)
@@ -422,18 +539,50 @@ void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<Delive
 
 	if (iNumOfCandidates < 5)
 	{
-		m_umap_Candidates.insert(std::make_pair(dTime , vecDelivery));
+		m_umap_Candidates.insert(std::make_pair(dTime + ((double)(rand() % 100) / 10000), vecDelivery));
 	}
 	else if (dTime < dLargestKey)
 	{
 		m_umap_Candidates.erase(dLargestKey);
-		m_umap_Candidates.insert(std::make_pair(dTime, vecDelivery));
+		m_umap_Candidates.insert(std::make_pair(dTime + ((double)(rand() % 100) / 10000), vecDelivery));
 	}
+}
+
+double CSPSolver::ReturnKeyOfBestCandidate()
+{
+	std::vector<double> vecKeys;
+
+	for (std::unordered_map<double, std::vector<DeliveryOrderSeq>>::iterator it = m_umap_Candidates.begin(); it != m_umap_Candidates.end(); it++)
+	{
+		vecKeys.push_back(it->first);
+	}
+
+	double dSmallestKey;
+
+	if (0 == vecKeys.size())
+	{
+		dSmallestKey = MAX_DIST_VALUE;
+	}
+	else
+	{
+		dSmallestKey = *min_element(vecKeys.begin(), vecKeys.end());
+	}
+
+	return dSmallestKey;
 }
 
 double CSPSolver::ReturnCurrentTime()
 {
 	return 0;
+}
+
+bool CSPSolver::CheckIfAllVarsInitialized()
+{
+	for (unsigned int iCount = 0; iCount < m_Assigned_Cobots.size(); iCount++)
+	{
+		if (false == m_Assigned_Cobots[iCount]){ return false; }
+	}
+	return true;
 }
 
 std::vector<int> GenerateSwapCombination(int iCombination, std::vector<int> vecRandomIntegers, int iNumOfCobots)
@@ -496,7 +645,11 @@ std::vector<int> GenerateRandomNumbers(int iMaxValue, int iNumOfValues)
 			vecRandom.push_back(rand() % iMaxValue);
 		}
 
-		if (vecRandom.end() == std::unique(vecRandom.begin(), vecRandom.end()))
+		if ((vecRandom[0] == vecRandom[1]) || (vecRandom[0] == vecRandom[2]) || (vecRandom[2] == vecRandom[1]))
+		{
+			continue;
+		}
+		else
 		{
 			break;
 		}

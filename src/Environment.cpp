@@ -162,8 +162,8 @@ Environment::Environment(int iTableSize, int iCapacity_Per_Location)
 
 Environment::~Environment()
 {
-	delete (pclPivotPoint);
-	pclPivotPoint = NULL;
+	//delete pclPivotPoint;
+	//pclPivotPoint = NULL;
 }
 
 TableState Environment::Is_Loc_In_Bounds(Location obLoc)
