@@ -178,12 +178,19 @@ std::pair<bool, SOLUTION> CSPSolver::SelectNode(int iCurrLoc, double dCurrentTim
 
 		iCobotIndex = Return_MCV_Cobot(&(vecPrevtriedValues));
 
-		//cout << iCobotIndex << "\n";
-
 		if (-1 == iCobotIndex)
 		{
 			return std::make_pair(false, SOLUTION::TIME_IN);
 		}
+
+		if ( (dCurrentTime >= m_vecTasks[iCobotIndex].m_dTaskDeadline) && m_bFeasibility )
+		{
+			return std::make_pair(false, SOLUTION::TIME_IN);
+		}
+
+		//cout << iCobotIndex << "\n";
+
+		
 		
 		vecPrevtriedValues.push_back(iCobotIndex);
 
@@ -565,7 +572,17 @@ double CSPSolver::ReturnKeyOfBestCandidate()
 	}
 	else
 	{
-		dSmallestKey = *min_element(vecKeys.begin(), vecKeys.end());
+		dSmallestKey = *(min_element(vecKeys.begin(), vecKeys.end()));
+	}
+
+	bool bRandom = (rand() % 2) > 0 ? false : true ;
+
+	if (bRandom)
+	{
+		int iRandom = rand() % m_umap_Candidates.size();
+		std::unordered_map<double, std::vector<DeliveryOrderSeq>>::iterator it = m_umap_Candidates.begin();
+		std::advance(it, iRandom);
+		return it->first;
 	}
 
 	return dSmallestKey;
