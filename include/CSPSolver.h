@@ -65,6 +65,7 @@ class CSPSolver
 		std::unordered_map<int, CompleteSeqInfo> m_umapCompleteSeqInfo;
 		std::unordered_map<double, std::vector<DeliveryOrderSeq>> m_umap_Candidates;
 
+		std::vector<bool> m_Assigned_Cobots;
 		std::vector<TaskInfo> m_vecTasks;
 		std::vector<Environment> m_vecEnvironments;
 		EnvironmentGeometry m_obGeometry;
@@ -77,10 +78,14 @@ class CSPSolver
 		std::pair<bool, SOLUTION> TraverseGraph(int iCobotCount, int iCurrLoc, double dCurrentTime);
 		std::pair<bool, SOLUTION> SelectPickUpLocation(Block obBlock, int iCobotCount, int iCurrLoc, double dCurrentTime);
 		std::pair<bool, SOLUTION> SelectDeliveryLocation(int iCobotCount, int iCurrLoc, Location obLoc, double dCurrentTime); //Location here is the location at which object was picked up
-		
+		std::pair<bool, SOLUTION> SelectNode(int iCurrLoc, double dCurrentTime);
+
 		void CheckForLocalImprovement(std::vector<int> vecRandom, std::vector<int> vecShuffle , std::vector<DeliveryOrderSeq>* pvecDeliverySequence);
 		void PopulateSequenceInfo();
 		void InsertSequenceIntoCandidatePool(double, std::vector<DeliveryOrderSeq>);
+		double ReturnKeyOfBestCandidate();
+		int Return_MCV_Cobot(std::vector<int>* pvecVals);
+		bool CheckIfAllVarsInitialized();
 
 	public:
 
