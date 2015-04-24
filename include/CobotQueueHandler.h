@@ -2,8 +2,8 @@
 
 class cobotQueue{	
 	private:
-		//ros::NodeHandle nh;
-		//ros::Publisher cobotQueuePub; //publishes number of Cobots in queue, among possibly other things
+		ros::NodeHandle nh;
+		// ros::Publisher cobotQueuePub; //publishes number of Cobots in queue, among possibly other things
 		std::vector<uint> cobotIds; //a list of the ID's of Cobot in queue
 		uint maxNDecisionMakers = 10; //maximum number of Cobots which can participate in plan decision-making
 
