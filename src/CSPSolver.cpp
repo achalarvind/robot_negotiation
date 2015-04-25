@@ -397,7 +397,7 @@ void CSPSolver::Perform3Swap()
 
 	if (iNumOfCobots > 15)
 	{
-		iMaxIterations = 500;
+		iMaxIterations = 2000;
 	}
 	else if (iNumOfCobots == 2)
 	{
@@ -504,7 +504,10 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 		}
 		else
 		{
-			dFeassibleCobots = dFeassibleCobots + 1.0;
+			if (dTime < it->second.m_dDeadline)
+			{
+				dFeassibleCobots = dFeassibleCobots + 1.0;
+			}
 		}
 
 		vecDelivery[iCount].m_dExpectedTime = dTime;  // Updates the delivery time of this sequence
@@ -558,7 +561,7 @@ void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<Delive
 double CSPSolver::ReturnKeyOfBestCandidate()
 {
 	std::vector<double> vecKeys;
-
+	
 	for (std::unordered_map<double, std::vector<DeliveryOrderSeq>>::iterator it = m_umap_Candidates.begin(); it != m_umap_Candidates.end(); it++)
 	{
 		vecKeys.push_back(it->first);
