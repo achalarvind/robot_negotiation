@@ -27,7 +27,7 @@ class cobotQueue{
 
 		std::vector< std::vector<uint> > collect_votes(uint nPlans);
 
-		bool send_best_plan(std::vector< std::vector<uint> > votesTable, uint nPlans);
+		int send_best_plan(std::vector< std::vector<uint> > votesTable, uint nPlans);
 
 };	
 	
