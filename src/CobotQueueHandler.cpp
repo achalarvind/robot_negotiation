@@ -2,7 +2,6 @@
 #include "../include/CobotQueueHandler.h"
 #include <algorithm>
 
-
 double variance(std::vector<uint> x,double mean)
 {
 	double variance = 0;
@@ -46,6 +45,7 @@ bool cobotQueue::remove_cobot(uint id)
 
 bool cobotQueue::initiate_vote() // Broadcasts a message to all CoBots in Queue to submit vote
 {
+	DeliveryOrderSeq a(1,s,0.0,0.0);
 	return false;
 }
 
@@ -85,12 +85,12 @@ int cobotQueue::send_best_plan(std::vector< std::vector<uint> > votesTable, uint
 }
 
 int main(){
- 	std::vector< std::vector<uint> > votesTable {{10,9,8,7,6},{1,2,3,4},{10,0,0,0}};
+ 	//std::vector< std::vector<uint> > votesTable {{10,9,8,7,6},{1,2,3,4},{10,0,0,0}};
     //std::cout<<variance({1,2,3},2)<<std::endl;
  	//votesTable[0] = {10,9,8,7,6};
 	//votesTable[1] = {9,10,7,8,6};
 	//votesTable[2] = {1,2,3,4};  
-    cobotQueue c({},3);
-    std::cout<<c.send_best_plan(votesTable,3)<<std::endl;
+    //cobotQueue c({},3);
+    //std::cout<<c.send_best_plan(votesTable,3)<<std::endl;
 	return 0;
 }

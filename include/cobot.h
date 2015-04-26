@@ -16,18 +16,13 @@ class ccobot{
 		int state;
 		int location;
 		bool has_object;
-<<<<<<< HEAD
+
 		robot_negotiation::TaskList tasks;
 
 	public:
-		std::vector<double> vote(std::vector<DeliveryOrderSeq>);
+		std::vector<double> vote(std::vector<std::vector<DeliveryOrderSeq>> plan_list);
 		double plan_cost(std::vector<DeliveryOrderSeq> plan);
-=======
-		std::vector<DeliveryOrderSeq> taskList;
 
-	public:
-		std::vector<double> vote(std::vector<DeliveryOrderSeq>); //gives list of costs for each plan
-		double plan_cost(std::vector<DeliveryOrderSeq> plan)
->>>>>>> b28ac47d3996ab4e4d8dd9c4cdbf009d7e4cad27
+		std::vector<DeliveryOrderSeq> taskList;
 		ccobot(uint cobotId);	
 };	
