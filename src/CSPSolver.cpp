@@ -76,7 +76,7 @@ int CSPSolver::ReturnDropOfLocation(std::string stLoc)
 	else{return 2;}
 }
 
-#ifdef ROS_VERSION
+#ifdef ROS_CODE
 std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks)
 #else
 std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks, bool bShuffle)
@@ -101,7 +101,7 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 	
 	//Sort by MCV heurisitc - deadlines are used here
 
-#ifdef ROS_VERSION
+#ifdef ROS_CODE
 
 #else
 	std::sort(m_vecTasks.begin(), m_vecTasks.end(), MCV_Deadline_Heurisitc);

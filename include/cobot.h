@@ -1,6 +1,8 @@
 #include <Environment.h>
 #include "ros/ros.h"
 #include "robot_negotiation/GetTasks.h"
+#include "robot_negotiation/Task.h"
+#include "robot_negotiation/TaskList.h"
 #include <cstdlib>
 #include <CSPSolver.h>
 
@@ -14,9 +16,10 @@ class ccobot{
 		int state;
 		int location;
 		bool has_object;
+		robot_negotiation::TaskList tasks;
 
 	public:
 		std::vector<double> vote(std::vector<DeliveryOrderSeq>);
-		double plan_cost(std::vector<DeliveryOrderSeq> plan)
+		double plan_cost(std::vector<DeliveryOrderSeq> plan);
 		ccobot(uint cobotId);	
 };	
