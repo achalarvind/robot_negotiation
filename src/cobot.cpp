@@ -12,7 +12,8 @@ ccobot::ccobot(uint cobotId){
 	else
 	{
 		ROS_ERROR("Failed to call service task_generator");
-	}	
+	}
+	taskList = srv.response.tasks.task_list[0]	
 
 	// ros::ServiceServer distance_service =nh.advertiseService<robot_negotiation::GetDistance::Request, robot_negotiation::GetDistance::Response>("/get_distance", boost::bind(getDistance, _1, _2, pWorld));
 
@@ -27,6 +28,7 @@ ccobot::ccobot(uint cobotId){
 // 	}
 // }
 
+<<<<<<< HEAD
 // double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 // {
 // 	for(int i =0; i < plan.size(); i++)
@@ -34,6 +36,18 @@ ccobot::ccobot(uint cobotId){
 // 		if(plan.m_iCobotNum == id) break;
 // 	}
 // }
+=======
+double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
+{
+	DeliveryOrderSeq action;
+	for(int i =0; i < plan.size(); i++)
+	{
+		if(plan[i].m_iCobotNum == id) {action = plan[i];  break;}
+	}
+	action.
+
+}
+>>>>>>> b28ac47d3996ab4e4d8dd9c4cdbf009d7e4cad27
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "cobot");	
