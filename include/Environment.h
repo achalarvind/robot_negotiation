@@ -5,6 +5,11 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include "ros/ros.h"
+#include "robot_negotiation/AddObject.h"
+#include "robot_negotiation/RemoveObject.h"
+#include "robot_negotiation/Block.h"
+#include "robot_negotiation/Location.h"
 //#include <boost/thread.hpp>
 
 class Block

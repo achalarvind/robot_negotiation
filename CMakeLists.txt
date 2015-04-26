@@ -49,6 +49,8 @@ add_message_files(
   FILES
   Task.msg
   TaskList.msg
+  Block.msg
+  Location.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -57,6 +59,8 @@ add_service_files(
   GetDistance.srv
   GetDistanceStochastic.srv
   GetTasks.srv
+  AddObject.srv
+  RemoveObject.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -104,6 +108,7 @@ include_directories(include)
 ## Declare a cpp executable
 add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 add_executable(cobot_node src/cobot.cpp)
+add_executable(environment_node src/Environment.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -115,6 +120,10 @@ add_executable(cobot_node src/cobot.cpp)
  )
 
 target_link_libraries(cobot_node
+   ${catkin_LIBRARIES}
+ )
+
+target_link_libraries(environment_node
    ${catkin_LIBRARIES}
  )
 
