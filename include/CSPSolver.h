@@ -35,9 +35,10 @@ class PickUpOrderSeqInfo
 		int m_iTableNum;
 		Location m_obLoc;
 		std::string m_strObjectName;
+		Block m_obBlock;
 		double m_dPickUpTime;
 
-		PickUpOrderSeqInfo(int, Location, std::string , double);
+		PickUpOrderSeqInfo(int, Location, std::string, double, Block);
 };
 
 class CompleteSeqInfo
@@ -48,8 +49,9 @@ class CompleteSeqInfo
 		int m_iDropOffLocation;
 		double m_dPickUpTime;
 		double m_dDeadline;
+		Block m_obBlock;
 
-		CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime);
+		CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock);
 };
 
 class CSPSolver
@@ -57,7 +59,7 @@ class CSPSolver
 	private:
 
 		const int m_c_iStartLocation;
-		const double m_c_dStartTime, m_c_Solver_Time_Out_Feasible, m_c_Solver_Time_Out_In_Feasible;
+		const double m_c_dStartTime, m_c_Solver_Time_Out_Feasible;
 		bool m_bFeasibility;
 
 		std::vector<DeliveryOrderSeq> m_vecCobotOrder;
@@ -67,6 +69,7 @@ class CSPSolver
 
 		std::vector<bool> m_Assigned_Cobots;
 		std::vector<TaskInfo> m_vecTasks;
+		std::vector<Environment> c_m_vecEnvironments; // Use it for const
 		std::vector<Environment> m_vecEnvironments;
 		EnvironmentGeometry m_obGeometry;
 
@@ -81,23 +84,25 @@ class CSPSolver
 		std::pair<bool, SOLUTION> SelectNode(int iCurrLoc, double dCurrentTime);
 
 		void CheckForLocalImprovement(std::vector<int> vecRandom, std::vector<int> vecShuffle , std::vector<DeliveryOrderSeq>* pvecDeliverySequence);
+		void CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrderSeq>* pvecDeliverySequence);
+
 		void PopulateSequenceInfo();
 		void InsertSequenceIntoCandidatePool(double, std::vector<DeliveryOrderSeq>);
 		double ReturnKeyOfBestCandidate();
 		int Return_MCV_Cobot(std::vector<int>* pvecVals);
 		bool CheckIfAllVarsInitialized();
+		std::tuple<double, int, Location> GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock, int iCurr, int iDest , double dCurrTime);
+	
+public:
 
-	public:
-
-		CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, double dTime_Out_2, EnvironmentGeometry obGeometry);
-		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>, std::vector<Environment*> , bool);
+	   CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
+		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>, bool);
 
 		typedef std::pair<std::pair<int , double>, std::pair<double, Location >> PickUpTime;
 		typedef std::pair<int, std::pair<double, int >> DeliveryTime;
 		
 		//Needs to be changed with ROS time
 		double ReturnCurrentTime();
-
 };
 
 #endif

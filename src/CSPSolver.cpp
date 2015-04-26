@@ -9,8 +9,8 @@
 
 using namespace std;
 
-std::vector<int> GenerateRandomNumbers(int iMaxValue, int iNumOfValues);
-std::vector<int> GenerateSwapCombination(int iCombination, std::vector<int> vecRandomIntegers, int iNumOfCobots);
+void GenerateRandomNumbers(int iMaxValue, int iNumOfValues, std::vector<int>* pvecRandom);
+void GenerateSwapCombination(int iCombination, std::vector<int>* pvecRandomIntegers, int iNumOfCobots, std::vector<int>* pvecSwapIndices);
 
 bool Time_To_Pick_At_Location_Sort(CSPSolver::PickUpTime obNode1, CSPSolver::PickUpTime obNode2)
 {
@@ -42,21 +42,23 @@ DeliveryOrderSeq::DeliveryOrderSeq(int iCobotNum, std::string strLoc, double dTi
 	m_dDeadLine = dDeadLine;
 }
 
-CompleteSeqInfo::CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime)
+CompleteSeqInfo::CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock)
 {
 	m_iCobotNum = iCobotNum;
 	m_iObjectPickUpLocation = iPickUp;
 	m_iDropOffLocation = iDropOff;
 	m_dDeadline = dDeadLine;
 	m_dPickUpTime = dPickUpTime;
+	m_obBlock = obBlock;
 }
 
-PickUpOrderSeqInfo::PickUpOrderSeqInfo(int iTableNum, Location stLoc, std::string strObjName, double dTime)
+PickUpOrderSeqInfo::PickUpOrderSeqInfo(int iTableNum, Location stLoc, std::string strObjName, double dTime, Block obBlock)
 {
 	m_iTableNum = iTableNum;
 	m_obLoc.SetLocation(stLoc.GetX() , stLoc.GetY());
 	m_strObjectName = strObjName;
 	m_dPickUpTime = dTime;
+	m_obBlock = obBlock;
 }
 
 std::string CSPSolver::ReturnDropOfLocation(int iLoc)
@@ -73,7 +75,7 @@ int CSPSolver::ReturnDropOfLocation(std::string stLoc)
 	else{return 2;}
 }
 
-std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks, std::vector<Environment*> vecptrEnvironments , bool bShuffle)
+std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks, bool bShuffle)
 {
 	m_bFeasibility = true;
 
@@ -84,6 +86,8 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 
 	m_vecTasks = vecCobotTasks;
 	
+	m_vecEnvironments = c_m_vecEnvironments;
+
 	//Initialize variables
 	for (unsigned int iCount = 0; iCount < m_vecTasks.size(); iCount++)
 	{
@@ -98,13 +102,7 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 		std::random_shuffle(m_vecTasks.begin(), m_vecTasks.end());
 	}
 
-	//Deep copy of environment variables
-	m_vecEnvironments.reserve(vecptrEnvironments.size());
-	for (unsigned int iCount = 0; iCount < vecptrEnvironments.size(); iCount++)
-	{
-		m_vecEnvironments.push_back(*(vecptrEnvironments[iCount]) );
-	}
-
+	
 #ifdef LARGE_TREE
 	std::pair<bool, SOLUTION> stSol = SelectNode(m_c_iStartLocation, m_c_dStartTime);
 #else
@@ -138,10 +136,17 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 	return m_umap_Candidates;
 }
 
-CSPSolver::CSPSolver(std::string strStartLocation, double dStartTime, double dTime_Out_1, double dTime_Out_2, EnvironmentGeometry obGeometry) : m_c_iStartLocation(ReturnDropOfLocation(strStartLocation)), m_c_dStartTime(dStartTime), m_c_Solver_Time_Out_Feasible(dTime_Out_1), m_c_Solver_Time_Out_In_Feasible(dTime_Out_2)
+CSPSolver::CSPSolver(std::string strStartLocation, double dStartTime, double dTime_Out_1, std::vector<Environment*> vecptrEnvironments, EnvironmentGeometry obGeometry) : m_c_iStartLocation(ReturnDropOfLocation(strStartLocation)), m_c_dStartTime(dStartTime), m_c_Solver_Time_Out_Feasible(dTime_Out_1)
 {
 	m_obGeometry = obGeometry;
 	m_bFeasibility = true;
+
+	//Deep copy of environment variables
+	c_m_vecEnvironments.reserve(vecptrEnvironments.size());
+	for (unsigned int iCount = 0; iCount < vecptrEnvironments.size(); iCount++)
+	{
+		c_m_vecEnvironments.push_back(*(vecptrEnvironments[iCount]));
+	}
 }
 
 int CSPSolver::Return_MCV_Cobot(std::vector<int>* pvecVals)
@@ -188,9 +193,7 @@ std::pair<bool, SOLUTION> CSPSolver::SelectNode(int iCurrLoc, double dCurrentTim
 			return std::make_pair(false, SOLUTION::TIME_IN);
 		}
 
-		//cout << iCobotIndex << "\n";
-
-		
+		//cout << iCobotIndex << "\n";		
 		
 		vecPrevtriedValues.push_back(iCobotIndex);
 
@@ -221,11 +224,6 @@ std::pair<bool, SOLUTION> CSPSolver::TraverseGraph(int iCobotIndex, int iCurrLoc
 	std::pair<bool, SOLUTION> stSol;
 
 	if ((ReturnCurrentTime() > m_c_Solver_Time_Out_Feasible) && m_bFeasibility)
-	{
-		return std::make_pair(false, SOLUTION::TIME_OUT);
-	}
-
-	if ((ReturnCurrentTime() > m_c_Solver_Time_Out_In_Feasible) && !m_bFeasibility)
 	{
 		return std::make_pair(false, SOLUTION::TIME_OUT);
 	}
@@ -287,7 +285,7 @@ std::pair<bool, SOLUTION> CSPSolver::SelectPickUpLocation(Block obBlock, int iCo
 		
 		m_vecEnvironments[iEnvNum].Remove_Element(obBlock, vecLocations[iCount].second.second);
 
-		m_vecPickUpObjectOrder.push_back(PickUpOrderSeqInfo(iEnvNum, vecLocations[iCount].second.second, obBlock.GetID(), dPickUpTime));
+		m_vecPickUpObjectOrder.push_back(PickUpOrderSeqInfo(iEnvNum, vecLocations[iCount].second.second, obBlock.GetID(), dPickUpTime, obBlock));
 
 		stSol = SelectDeliveryLocation(iCobotIndex, iEnvNum, vecLocations[iCount].second.second, vecLocations[iCount].second.first);
 
@@ -358,6 +356,8 @@ std::pair<bool, SOLUTION> CSPSolver::SelectDeliveryLocation(int iCobotIndex, int
 void CSPSolver::Perform3Swap()
 {
 	int iNumOfCobots = m_vecCobotOrder.size();
+	std::vector<int> vecSwapIndices{ -1, -1, -1 };
+	std::vector<int> vecRandomIntegers{-1 ,-1 ,-1};
 
 	if (m_bFeasibility)
 	{
@@ -410,20 +410,19 @@ void CSPSolver::Perform3Swap()
 
 	for (unsigned int iIterations = 0; iIterations < iMaxIterations; iIterations++)
 	{
-		std::vector<int> vecRandomIntegers;
 		int iPermutations;
 
 		if (iNumOfCobots >= 3)
 		{
-			vecRandomIntegers = GenerateRandomNumbers(iNumOfCobots, 3);
+			GenerateRandomNumbers(iNumOfCobots, 3, &vecRandomIntegers);
 			iPermutations = 5;
 		}
 		else
 		{
-			vecRandomIntegers = GenerateRandomNumbers(iNumOfCobots, iNumOfCobots);
+			GenerateRandomNumbers(iNumOfCobots, iNumOfCobots, &vecRandomIntegers);
 			iPermutations = 2;
 		}
-		
+
 		for (int iCombination = 0; iCombination < iPermutations; iCombination++)
 		{
 			vecCombinations[iCombination].clear();
@@ -433,7 +432,7 @@ void CSPSolver::Perform3Swap()
 				vecCombinations[iCombination].push_back(vecNewSequence[iCount]);
 			}
 			
-			std::vector<int> vecSwapIndices = GenerateSwapCombination(iCombination, vecRandomIntegers , iNumOfCobots);
+			GenerateSwapCombination(iCombination, &vecRandomIntegers, iNumOfCobots, &vecSwapIndices);
 
 			CheckForLocalImprovement(vecRandomIntegers, vecSwapIndices, &vecCombinations[iCombination]);
 		}
@@ -448,6 +447,7 @@ void CSPSolver::PopulateSequenceInfo()
 {
 	int iCobotNum, iPickUp, iDropOff; 
 	double dDeadLine , dPickUpTime;
+	Block obBlock;
 
 	for (unsigned int iCount = 0; iCount < m_vecCobotOrder.size(); iCount++)
 	{
@@ -457,15 +457,16 @@ void CSPSolver::PopulateSequenceInfo()
 
 		iPickUp = m_vecPickUpObjectOrder[iCount].m_iTableNum;
 		dPickUpTime = m_vecPickUpObjectOrder[iCount].m_dPickUpTime;
+		obBlock = m_vecPickUpObjectOrder[iCount].m_obBlock;
 
-		m_umapCompleteSeqInfo.insert(std::make_pair(iCobotNum, CompleteSeqInfo(iCobotNum, iPickUp, iDropOff, dDeadLine, dPickUpTime)));
+		m_umapCompleteSeqInfo.insert(std::make_pair(iCobotNum, CompleteSeqInfo(iCobotNum, iPickUp, iDropOff, dDeadLine, dPickUpTime, obBlock)));
 	}
 }
 
 void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector<int> vecShuffle, std::vector<DeliveryOrderSeq>* pvecDeliverySequence)
 {
 	int iBaxterStartLocation = m_c_iStartLocation;
-	std::vector<DeliveryOrderSeq> vecDelivery = *pvecDeliverySequence;
+	std::vector<DeliveryOrderSeq> vecDelivery = *pvecDeliverySequence;	
 
 	std::vector<DeliveryOrderSeq> vecOb;
 
@@ -473,7 +474,7 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 	{
 		vecOb.push_back(vecDelivery[vecRandom[iCount]]);
 	}
-	
+
 	for (unsigned int iCount = 0; iCount < vecRandom.size(); iCount++)
 	{
 		vecDelivery[vecShuffle[iCount]] = vecOb[iCount];
@@ -488,6 +489,7 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 	double dTime = m_c_dStartTime;
 	double dFeassibleCobots = 0;
 
+	// Strategy
 	for (unsigned int iCount = 0; iCount < vecDelivery.size(); iCount++)
 	{
 		iCurrCobot = vecDelivery[iCount].m_iCobotNum;
@@ -500,7 +502,10 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 
 		if (m_bFeasibility)
 		{
-			if (dTime > it->second.m_dDeadline) { return; }
+			if (dTime > it->second.m_dDeadline) 
+			{ 
+				return CheckForLocalImprovementGreedyStartegy(&vecDelivery);
+			}
 		}
 		else
 		{
@@ -523,6 +528,116 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 	{
 		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, vecDelivery);
 	}
+
+	CheckForLocalImprovementGreedyStartegy(&vecDelivery);
+}
+
+void CSPSolver::CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrderSeq>* pvecDeliverySequence)
+{
+	//Greedy strategy
+	std::vector<Environment> vecEnv(c_m_vecEnvironments);
+
+	std::vector<DeliveryOrderSeq> vecGreedyDelivery = *pvecDeliverySequence;
+
+	std::tuple<double, int, Location> stResult;
+
+	int iBaxterStartLocation = m_c_iStartLocation;
+	int iBestDest;
+	double dCurrTime;
+
+	double dFeassibleCobots = 0;
+
+	for (unsigned int iCount = 0; iCount < vecGreedyDelivery.size(); iCount++)
+	{
+		std::unordered_map<int, CompleteSeqInfo>::iterator it = m_umapCompleteSeqInfo.find(vecGreedyDelivery[iCount].m_iCobotNum);
+		std::tuple<double, int, Location> stBestResult = std::make_tuple(MAX_DIST_VALUE, 0, Location()); //Dummy initialization  
+
+		if (0 == iCount) { dCurrTime = m_c_dStartTime; }
+		else { dCurrTime = vecGreedyDelivery[iCount - 1].m_dExpectedTime; }
+
+		for (int iStart = 0; iStart < 3; iStart++)
+		{
+			double dTravCost = m_obGeometry.ReturnTravDistance(iBaxterStartLocation, iStart);
+
+			for (int iDest = 0; iDest < 3; iDest++)
+			{
+				stResult = GetPairWiseShortestCosts(&vecEnv, it->second.m_obBlock, iStart, iDest, dCurrTime);
+				std::get<0>(stResult) = std::get<0>(stResult) +dTravCost;
+
+				if (std::get<0>(stBestResult) > std::get<0>(stResult))
+				{
+					stBestResult = stResult;
+					iBestDest = iDest;
+				}
+			}
+		}
+
+		vecEnv.at(std::get<1>(stBestResult)).Remove_Element(it->second.m_obBlock, std::get<2>(stBestResult));
+		vecGreedyDelivery[iCount].m_dExpectedTime = std::get<0>(stBestResult);
+		iBaxterStartLocation = iBestDest;
+		vecGreedyDelivery[iCount].m_strLoc = ReturnDropOfLocation(std::get<1>(stBestResult));
+
+		if (m_bFeasibility)
+		{
+			if (vecGreedyDelivery[iCount].m_dExpectedTime > it->second.m_dDeadline) 
+			{ return; }
+		}
+		else
+		{
+			if (vecGreedyDelivery[iCount].m_dExpectedTime < it->second.m_dDeadline)
+			{
+				dFeassibleCobots = dFeassibleCobots + 1.0;
+			}
+		}
+	}
+
+	if (m_bFeasibility)
+	{
+		InsertSequenceIntoCandidatePool(vecGreedyDelivery[vecGreedyDelivery.size()-1].m_dExpectedTime, vecGreedyDelivery);		
+	}
+	else
+	{
+		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, vecGreedyDelivery);		
+	}
+}
+
+std::tuple<double , int , Location> CSPSolver::GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock , int iCurr , int iDest , double dCurrTime)
+{
+	Location stLoc;
+	std::tuple<double, int , Location> stResult = std::make_tuple(MAX_DIST_VALUE, -1, stLoc);
+	double dDistance_At_Table , dTime_At_Table, dTime, dCurrToTable, dTableToDest;
+
+	for (int iTable = 0; iTable < 3; iTable++)
+	{
+		dCurrToTable = m_obGeometry.ReturnTravDistance(iCurr, iTable);
+		dTime = (dCurrToTable / BAXTER_TRAV_SPEED);
+
+		dDistance_At_Table = pvecEnvVars->at(iTable).GetNearestObjectLocation(obBlock, &stLoc);
+
+		if (MAX_DIST_VALUE == dDistance_At_Table)
+		{
+			dTime_At_Table = MAX_DIST_VALUE;
+		}
+		else
+		{
+			dTime_At_Table = (dDistance_At_Table / BAXTER_PICK_UP_SPEED);
+		}
+
+		dTime = dTime + dTime_At_Table;
+		dTime = dTime + TIME_TO_PLACE_OBJECT;
+
+		dTableToDest = m_obGeometry.ReturnTravDistance(iTable, iDest);
+		dTime = dTime + (dTableToDest / BAXTER_TRAV_SPEED);		
+
+		if (std::get<0>(stResult) > dTime)
+		{
+			stResult = std::make_tuple(dTime, iTable, stLoc);
+		}
+	}
+
+	std::get<0>(stResult) = std::get<0>(stResult) +dCurrTime;
+
+	return stResult;
 }
 
 void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<DeliveryOrderSeq> vecDelivery)
@@ -605,67 +720,58 @@ bool CSPSolver::CheckIfAllVarsInitialized()
 	return true;
 }
 
-std::vector<int> GenerateSwapCombination(int iCombination, std::vector<int> vecRandomIntegers, int iNumOfCobots)
-{
-	std::vector<int> vecSwapIndices;
-
-	for (unsigned int iCount = 0; iCount < vecRandomIntegers.size(); iCount++)
-	{
-		vecSwapIndices.push_back(-1);
-	}
-
+void GenerateSwapCombination(int iCombination, std::vector<int>* pvecRandomIntegers, int iNumOfCobots, std::vector<int>* pvecSwapIndices)
+{	
 	if (2 == iNumOfCobots)
 	{
 		if (0 == iCombination)
 		{
-			vecSwapIndices[0] = vecRandomIntegers[0];   vecSwapIndices[1] = vecRandomIntegers[1];
+			pvecSwapIndices->at(0) = pvecRandomIntegers->at(0);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(1);
 		}
 		else if (1 == iCombination)
 		{
-			vecSwapIndices[0] = vecRandomIntegers[1];   vecSwapIndices[1] = vecRandomIntegers[0];
+			pvecSwapIndices->at(0) = pvecRandomIntegers->at(1);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(0);
 		}
-
-		return vecSwapIndices;
+		return ;
 	}
 
 	if (0 == iCombination)
 	{
-		vecSwapIndices[0] = vecRandomIntegers[0];   vecSwapIndices[1] = vecRandomIntegers[2];  vecSwapIndices[2] = vecRandomIntegers[1];
+		pvecSwapIndices->at(0) = pvecRandomIntegers->at(0);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(2);  pvecSwapIndices->at(2) = pvecRandomIntegers->at(1);
 	}
 	else if (1 == iCombination)
 	{
-		vecSwapIndices[0] = vecRandomIntegers[1];   vecSwapIndices[1] = vecRandomIntegers[0];  vecSwapIndices[2] = vecRandomIntegers[2];
+		pvecSwapIndices->at(0) = pvecRandomIntegers->at(1);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(0);  pvecSwapIndices->at(2) = pvecRandomIntegers->at(2);
 	}
 	else if (2 == iCombination)
 	{
-		vecSwapIndices[0] = vecRandomIntegers[1];   vecSwapIndices[1] = vecRandomIntegers[2];  vecSwapIndices[2] = vecRandomIntegers[0];
+		pvecSwapIndices->at(0) = pvecRandomIntegers->at(1);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(2);  pvecSwapIndices->at(2) = pvecRandomIntegers->at(0);
 	}
 	else if (3 == iCombination)
 	{
-		vecSwapIndices[0] = vecRandomIntegers[2];   vecSwapIndices[1] = vecRandomIntegers[1];  vecSwapIndices[2] = vecRandomIntegers[0];
+		pvecSwapIndices->at(0) = pvecRandomIntegers->at(2);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(1);  pvecSwapIndices->at(2) = pvecRandomIntegers->at(0);
 	}
 	else
 	{
-		vecSwapIndices[0] = vecRandomIntegers[2];   vecSwapIndices[1] = vecRandomIntegers[0];  vecSwapIndices[2] = vecRandomIntegers[1];
+		pvecSwapIndices->at(0) = pvecRandomIntegers->at(2);   pvecSwapIndices->at(1) = pvecRandomIntegers->at(0);  pvecSwapIndices->at(2) = pvecRandomIntegers->at(1);
 	}
 
-	return vecSwapIndices;
+	return;
 }
 
-std::vector<int> GenerateRandomNumbers(int iMaxValue, int iNumOfValues)
+void GenerateRandomNumbers(int iMaxValue, int iNumOfValues, std::vector<int>* pvecRandom)
 {
-	std::vector<int> vecRandom;
-
+	time_t t;
+	srand((unsigned)time(&t));
+	
 	while (1)
 	{
-		vecRandom.clear();
-
 		for (int iCount = 0; iCount < iNumOfValues; iCount++)
 		{
-			vecRandom.push_back(rand() % iMaxValue);
+			pvecRandom->at(iCount) = (rand() % iMaxValue);
 		}
 
-		if ((vecRandom[0] == vecRandom[1]) || (vecRandom[0] == vecRandom[2]) || (vecRandom[2] == vecRandom[1]))
+		if ((pvecRandom->at(0) == pvecRandom->at(1)) || (pvecRandom->at(0) == pvecRandom->at(2)) || (pvecRandom->at(2) == pvecRandom->at(1)))
 		{
 			continue;
 		}
@@ -673,7 +779,5 @@ std::vector<int> GenerateRandomNumbers(int iMaxValue, int iNumOfValues)
 		{
 			break;
 		}
-	}
-
-	return vecRandom;
+	}	
 }
