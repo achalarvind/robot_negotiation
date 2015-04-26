@@ -84,7 +84,7 @@ class Environment
 		~Environment();
 
 		TableState Add_Element(Block obBlock, Location obLoc);
-		TableState Remove_Element(Block obBlock, Location obLoc);
+		TableState Remove_Element(Block obBlock, Location obLoc , bool bTimeDelay = false);
 		bool Get_Object_Locations(Block obBlock, std::unordered_map<std::string , std::pair<Location, double>> *);
 		double GetNearestObjectLocation(Block obBlock, Location *pclLoc);
 		bool Is_Table_In_Use();

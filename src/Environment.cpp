@@ -1,6 +1,6 @@
 #include "Environment.h"
 #include "Constants.h"
-
+#include <chrono>
 
 int EnvironmentGeometry::g_iTotalLocations = 3;
 
@@ -56,7 +56,7 @@ Location::Location()
 
 double Location::GetDistanceToLocation(Location *pclLoc)
 {
-	return (((m_iX - pclLoc->GetX()) * (m_iX - pclLoc->GetX())) + ((m_iY - pclLoc->GetY()) * (m_iY - pclLoc->GetY())));
+	return sqrtf (1.0 * (((m_iX - pclLoc->GetX()) * (m_iX - pclLoc->GetX())) + ((m_iY - pclLoc->GetY()) * (m_iY - pclLoc->GetY()))) );
 }
 
 int Location::GetX()
@@ -222,7 +222,7 @@ TableState Environment::Add_Element(Block obBlock, Location obLoc)
 	return TableState::OBJECT_ADDED;
 }
 
-TableState Environment::Remove_Element(Block obBlock, Location obLoc)
+TableState Environment::Remove_Element(Block obBlock, Location obLoc, bool bTimeDelay)
 {
 	//boost::lock_guard<boost::mutex> guard(m_bmutex);
 
@@ -231,6 +231,19 @@ TableState Environment::Remove_Element(Block obBlock, Location obLoc)
 	if (!bRemoved)
 	{
 		return TableState::OBJECT_NOT_REMOVED;
+	}
+
+	if (bTimeDelay)
+	{
+		time_t t;
+		srand((unsigned)time(&t));
+
+		double dDist = sqrtf(1.0 *( (obLoc.GetX()) ^ 2 + (obLoc.GetY()) ^ 2 ) );
+		double dDelayFactor = ( rand() % ((int)(100 * MAX_DELAY_TIME_PROP_DISTANCE)) )/100.0;
+		double dTime = ( dDist * (1 + dDelayFactor) )/(BAXTER_PICK_UP_SPEED);
+
+		//Insert Time delay here - Uses dTime
+
 	}
 
 	return TableState::OBJECT_REMOVED;
@@ -265,11 +278,11 @@ double Environment::GetNearestObjectLocation(Block obBlock , Location *pclLoc)
 
 	double dNearestDistance = MAX_DIST_VALUE;
 	double dDist;
-	
+
 	for (LocationsDistance::iterator it = umapLocations.begin(); it != umapLocations.end(); it++)
 	{
 		dDist = it->second.first.GetDistanceToLocation(pclPivotPoint);
-		
+
 		if (dDist < dNearestDistance)
 		{
 			dNearestDistance = dDist;
