@@ -42,6 +42,20 @@ Block& Block::operator = (const Block &cSource)
 	return *this;
 }
 
+void Block::serialize(boost::archive::text_iarchive & ar, const unsigned int file_version)
+{
+	ar & m_str;
+	ar & m_str_ID;
+	ar & m_iHeight;
+}
+
+void Block::serialize(boost::archive::text_oarchive & ar, const unsigned int file_version)
+{
+	ar & m_str;
+	ar & m_str_ID;
+	ar & m_iHeight;
+}
+
 Location::Location(int iX, int iY)
 {
 	m_iX = iX;
@@ -73,6 +87,18 @@ void Location::SetLocation(int iX, int iY)
 {
 	m_iX = iX;
 	m_iY = iY;
+}
+
+void Location::serialize(boost::archive::text_iarchive & ar, const unsigned int file_version)
+{
+	ar & m_iX;
+	ar & m_iY;
+}
+
+void Location::serialize(boost::archive::text_oarchive & ar, const unsigned int file_version)
+{
+	ar & m_iX;
+	ar & m_iY;
 }
 
 BlockStack::BlockStack()
@@ -139,7 +165,17 @@ BlockStack& BlockStack::operator = (const BlockStack &cSource)
 	return *this;
 }
 
-Environment::Environment(FILE *pFile)
+void BlockStack::serialize(boost::archive::text_iarchive & ar, const unsigned int file_version)
+{
+	ar & m_vecStackBlocks;
+}
+
+void BlockStack::serialize(boost::archive::text_oarchive & ar, const unsigned int file_version)
+{
+	ar & m_vecStackBlocks;
+}
+
+Environment::Environment()
 {
 	;
 }
@@ -361,3 +397,21 @@ EnvironmentGeometry& EnvironmentGeometry::operator= (const EnvironmentGeometry &
 
 	return *this;
 }
+
+void Environment::serialize(boost::archive::text_iarchive & ar, const unsigned int file_version)
+ {
+	 ar & m_iTableSize;
+	 ar & m_vecTable;
+	 ar & m_iCapacity_Per_Location;
+	 ar & m_Table_In_Use;
+	 ar & pclPivotPoint;
+ }
+
+void Environment::serialize(boost::archive::text_oarchive & ar, const unsigned int file_version)
+ {
+	 ar & m_iTableSize;
+	 ar & m_vecTable;
+	 ar & m_iCapacity_Per_Location;
+	 ar & m_Table_In_Use;
+	 ar & pclPivotPoint;
+ }

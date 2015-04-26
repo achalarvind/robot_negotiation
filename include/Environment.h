@@ -5,6 +5,9 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 //#include <boost/thread.hpp>
 
 class Block
@@ -21,6 +24,9 @@ class Block
 		std::string GetID();
 		int GetHeight();
 		Block& operator = (const Block &cSource);
+
+		void serialize(boost::archive::text_iarchive & ar, const unsigned int file_version);
+		void serialize(boost::archive::text_oarchive & ar, const unsigned int file_version);
 };
 
 class Location
@@ -34,6 +40,9 @@ public:
 	int GetY();
 	double GetDistanceToLocation(Location *pclLoc);
 	void SetLocation(int iX, int iY);
+
+	void serialize(boost::archive::text_iarchive & ar, const unsigned int file_version);
+	void serialize(boost::archive::text_oarchive & ar, const unsigned int file_version);
 };
 
 class BlockStack
@@ -47,6 +56,9 @@ class BlockStack
 		bool Get_Object_Locations(Block obBlock, Location loc, std::unordered_map<std::string , std::pair<Location, double>> *pvecLocations);
 		bool RemoveBlock(Block block);
 		BlockStack& operator= (const BlockStack &cSource);
+
+		void serialize(boost::archive::text_iarchive & ar, const unsigned int file_version);
+		void serialize(boost::archive::text_oarchive & ar, const unsigned int file_version);
 };
 
 enum class Action
@@ -79,7 +91,7 @@ class Environment
 		Location *pclPivotPoint;
 
 	public:
-		Environment(FILE *pFile);
+		Environment();
 		Environment(int iTableSize, int m_iCapacity_Per_Location);
 		~Environment();
 
@@ -91,6 +103,8 @@ class Environment
 		int GetStackHeight(Location obLoc);
         static int GenerateID();
 		Environment& operator= (const Environment &cSource);
+		void serialize(boost::archive::text_iarchive & ar, const unsigned int file_version);
+		void serialize(boost::archive::text_oarchive & ar, const unsigned int file_version);
 };
 
 class EnvironmentGeometry
