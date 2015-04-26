@@ -85,9 +85,9 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 		object_id = randint(0,nObjects-1)
 		location = vKeys[randint(0,nVertices-1)]
 		#get the estimated task execution time (for now Euclidean distance from reference point
-		# distance=get_distance(int(location),int(waitingNode))
-		distance=100
-		est_time = 2*distance/avSpeed
+		distance=get_distance(int(location),int(waitingNode))
+		#distance=100
+		est_time = 2*distance.distance/avSpeed
 		totalTime += est_time
 		if totalTime > horizon: break
 		t = task()

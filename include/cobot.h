@@ -14,9 +14,10 @@ class ccobot{
 		int state;
 		int location;
 		bool has_object;
+		std::vector<DeliveryOrderSeq> taskList;
 
 	public:
-		std::vector<double> vote(std::vector<DeliveryOrderSeq>);
+		std::vector<double> vote(std::vector<DeliveryOrderSeq>); //gives list of costs for each plan
 		double plan_cost(std::vector<DeliveryOrderSeq> plan)
 		ccobot(uint cobotId);	
 };	
