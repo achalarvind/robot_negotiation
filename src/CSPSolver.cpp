@@ -7,6 +7,7 @@
 
 #define LARGE_TREE   
 
+
 using namespace std;
 
 void GenerateRandomNumbers(int iMaxValue, int iNumOfValues, std::vector<int>* pvecRandom);
@@ -75,7 +76,11 @@ int CSPSolver::ReturnDropOfLocation(std::string stLoc)
 	else{return 2;}
 }
 
+#ifdef ROS_VERSION
+std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks)
+#else
 std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks, bool bShuffle)
+#endif
 {
 	m_bFeasibility = true;
 
@@ -95,12 +100,16 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 	}
 	
 	//Sort by MCV heurisitc - deadlines are used here
-	std::sort(m_vecTasks.begin(), m_vecTasks.end(), MCV_Deadline_Heurisitc);
 
+#ifdef ROS_VERSION
+
+#else
+	std::sort(m_vecTasks.begin(), m_vecTasks.end(), MCV_Deadline_Heurisitc);
 	if (bShuffle)
 	{
 		std::random_shuffle(m_vecTasks.begin(), m_vecTasks.end());
 	}
+#endif
 
 	
 #ifdef LARGE_TREE

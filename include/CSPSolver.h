@@ -2,6 +2,7 @@
 #define CSPSOLVER_H
 
 #include "Environment.h"
+#define ROS_VERSION
 
 class TaskInfo
 {
@@ -94,9 +95,14 @@ class CSPSolver
 		std::tuple<double, int, Location> GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock, int iCurr, int iDest , double dCurrTime);
 	
 public:
+	
+	    CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
 
-	   CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
+#ifdef ROS_VERSION	
+		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>);
+#else
 		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>, bool);
+#endif
 
 		typedef std::pair<std::pair<int , double>, std::pair<double, Location >> PickUpTime;
 		typedef std::pair<int, std::pair<double, int >> DeliveryTime;
