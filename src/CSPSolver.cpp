@@ -41,6 +41,15 @@ DeliveryOrderSeq::DeliveryOrderSeq(int iCobotNum, std::string strLoc, double dTi
 	m_dDeadLine = dDeadLine;
 }
 
+void DeliveryOrderSeq::set(DeliveryOrderSeq a)
+{
+	m_iCobotNum = a.m_iCobotNum;
+	m_strLoc = a.m_strLoc;
+	m_dExpectedTime = a.m_dExpectedTime ;
+	m_dDeadLine = a.m_dDeadLine ;	
+}
+
+
 CompleteSeqInfo::CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock)
 {
 	m_iCobotNum = iCobotNum;
