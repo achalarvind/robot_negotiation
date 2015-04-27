@@ -22,8 +22,8 @@ class ccobot{
 	public:
 		std::vector<double> vote(std::vector<std::vector<DeliveryOrderSeq>> plan_list);
 		double plan_cost(std::vector<DeliveryOrderSeq> plan);
-        int count_missed_deadlines(double,ros_negotiation::TaskList);
+        //int count_missed_deadlines(double,ros_negotiation::TaskList);
 
 		std::vector<DeliveryOrderSeq> taskList;
-		ccobot(uint cobotId);	
+		ccobot(uint cobotId);
 };	
