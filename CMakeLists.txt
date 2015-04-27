@@ -52,6 +52,10 @@ add_message_files(
   Block.msg
   Location.msg
   CurrentTask.msg
+  Action.msg
+  Plan.msg
+  ResultTask.msg
+  TaskVector.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -63,7 +67,7 @@ add_service_files(
   AddObject.srv
   RemoveObject.srv
   SerializeEnvironment.srv
-  DeSerializeEnvironment.srv
+  DeSerializeEnvironmentPlan.srv
 )
 
 ## Generate actions in the 'action' folder

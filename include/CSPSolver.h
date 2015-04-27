@@ -3,7 +3,6 @@
 
 #include <Environment.h>
 #include "ros/ros.h"
-#include "robot_negotiation/DeSerializeEnvironment.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
