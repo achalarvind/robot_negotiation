@@ -31,6 +31,7 @@ ccobot::ccobot(uint cobotId){
 
 double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 {
+<<<<<<< HEAD
 	std::string s;
 	DeliveryOrderSeq a(1,s,0.0,0.0);
 	for(int i =0; i < plan.size(); i++)
@@ -38,6 +39,14 @@ double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 		if(plan[i].m_iCobotNum == id) {a.set(plan[i]);  break;}
 	}
 	count_missed_deadlines(a.m_dExpectedTime,tasks);
+=======
+	// std::string s;
+	// CSPSolver::DeliveryOrderSeq a(1,s,0.0,0.0);
+	// for(int i =0; i < plan.size(); i++)
+	// {
+	// 	if(plan[i].m_iCobotNum == id) {a = plan[i];  break;}
+	// }
+>>>>>>> cd759143db8a967fea4737e708a58dc948895dfa
         return 0;	
 }
 

@@ -1,7 +1,15 @@
 #ifndef CSPSOLVER_H	   
 #define CSPSOLVER_H
 
-#include "Environment.h"
+#include <Environment.h>
+#include "ros/ros.h"
+#include "robot_negotiation/DeSerializeEnvironment.h"
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <fstream>
+#include <sstream>
+
 #define ROS_CODE
 
 class TaskInfo

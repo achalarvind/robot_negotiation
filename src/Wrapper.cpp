@@ -51,8 +51,8 @@ int main(int argc, char** argv)
 	//boost::archive::text_iarchive ia(ifs);
 	//ia >> obNewWorld;
 	//ifs.close();
-	ros::init(argc, argv, "world_node");
- 	ros::NodeHandle n;
+	ros::init(argc, argv, "world");
+ 	ros::NodeHandle n("~");
 
 	std::ifstream stVtxPath;
 	// stVtxPath.open("../../../src/robot_negotiation/data_files/MapVertices.txt");

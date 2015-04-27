@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS serialization system)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -49,6 +49,8 @@ add_message_files(
   FILES
   Task.msg
   TaskList.msg
+  Block.msg
+  Location.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -57,6 +59,10 @@ add_service_files(
   GetDistance.srv
   GetDistanceStochastic.srv
   GetTasks.srv
+  AddObject.srv
+  RemoveObject.srv
+  SerializeEnvironment.srv
+  DeSerializeEnvironment.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -95,15 +101,23 @@ CATKIN_DEPENDS message_runtime
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(include)
+include_directories(${Boost_INCLUDE_DIR})
 
 ## Declare a cpp library
-# add_library(robot_negotiation
-#   src/${PROJECT_NAME}/robot_negotiation.cpp
-# )
+add_library(robot_negotiation_environment
+  src/Environment.cpp
+)
+
+add_library(robot_negotiation_csp_solver
+  src/CSPSolver.cpp
+)
 
 ## Declare a cpp executable
 add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 add_executable(cobot_node src/cobot.cpp)
+add_executable(environment_node src/table.cpp)
+add_executable(csp_solver_node src/generate_plans.cpp)
+
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -116,6 +130,19 @@ add_executable(cobot_node src/cobot.cpp)
 
 target_link_libraries(cobot_node
    ${catkin_LIBRARIES}
+ )
+
+target_link_libraries(environment_node
+  robot_negotiation_environment
+   ${catkin_LIBRARIES}
+   ${Boost_LIBRARIES}
+ )
+
+ target_link_libraries(csp_solver_node
+  robot_negotiation_environment 
+  robot_negotiation_csp_solver
+   ${catkin_LIBRARIES}
+   ${Boost_LIBRARIES}
  )
 
 #############
