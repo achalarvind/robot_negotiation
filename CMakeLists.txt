@@ -105,11 +105,8 @@ include_directories(include)
 include_directories(${Boost_INCLUDE_DIR})
 
 ## Declare a cpp library
-add_library(robot_negotiation_environment
+add_library(robot_negotiation_lib
   src/Environment.cpp
-)
-
-add_library(robot_negotiation_csp_solver
   src/CSPSolver.cpp
 )
 
@@ -125,23 +122,27 @@ add_executable(csp_solver_node src/generate_plans.cpp)
 # add_dependencies(robot_negotiation_node robot_negotiation_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
+ target_link_libraries(robot_negotiation_lib
+   ${Boost_LIBRARIES}
+ )
+
  target_link_libraries(world_node
    ${catkin_LIBRARIES}
  )
 
 target_link_libraries(cobot_node
+  robot_negotiation_lib
    ${catkin_LIBRARIES}
  )
 
 target_link_libraries(environment_node
-  robot_negotiation_environment
+  robot_negotiation_lib
    ${catkin_LIBRARIES}
    ${Boost_LIBRARIES}
  )
 
  target_link_libraries(csp_solver_node
-  robot_negotiation_environment 
-  robot_negotiation_csp_solver
+  robot_negotiation_lib 
    ${catkin_LIBRARIES}
    ${Boost_LIBRARIES}
  )

@@ -33,7 +33,7 @@ double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 {
 
 	std::string s;
-	//DeliveryOrderSeq a(1,s,0.0,0.0);
+	DeliveryOrderSeq a(1,s,0.0,0.0);
 	for(int i =0; i < plan.size(); i++)
 	{
 		//if(plan[i].m_iCobotNum == id) {a.set(plan[i]);  break;}
