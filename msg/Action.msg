@@ -1,0 +1,3 @@
+int64 cobot_id
+string location
+float64 expected_completion_time
