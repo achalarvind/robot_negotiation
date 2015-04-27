@@ -51,6 +51,7 @@ add_message_files(
   TaskList.msg
   Block.msg
   Location.msg
+  CurrentTask.msg
 )
 
 ## Generate services in the 'srv' folder

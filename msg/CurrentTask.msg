@@ -1,0 +1,3 @@
+string object_type
+int64 cobot_id
+float64 deadline
