@@ -1,3 +1,4 @@
 <launch>
-  <node name="cobot0" pkg="robot_negotiation" type="cobot_node" args="_cobot_id:=0" />
+  <node ns="0" name="cobot0" pkg="robot_negotiation" type="cobot_node" args="_cobot_id:=0" />
+  <node ns="1" name="cobot0" pkg="robot_negotiation" type="cobot_node" args="_cobot_id:=0" />
 </launch>

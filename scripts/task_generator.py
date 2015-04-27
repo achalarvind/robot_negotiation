@@ -26,7 +26,7 @@ fn0 = os.path.join(path,'../data_files') #objects path
 waitingNode = 16; #GHC6
 
 
-get_distance = rospy.ServiceProxy('get_distance', GetDistance)
+getdistance = rospy.ServiceProxy('get_distance', GetDistance)
 # Load vertices
 vfn = os.path.join(fnV ,"MapVertices.dat")
 print vfn
@@ -85,8 +85,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 		object_id = randint(0,nObjects-1)
 		location = vKeys[randint(0,nVertices-1)]
 		#get the estimated task execution time (for now Euclidean distance from reference point
-		distance=get_distance(int(location),int(waitingNode))
-		#distance=100
+		distance = getdistance(11,1)
 		est_time = 2*distance.distance/avSpeed
 		totalTime += est_time
 		if totalTime > horizon: break
