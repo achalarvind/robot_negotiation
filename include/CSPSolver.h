@@ -36,6 +36,7 @@ class DeliveryOrderSeq
 		double m_dDeadLine;
 
 		DeliveryOrderSeq(int , std::string , double , double);
+		void set(DeliveryOrderSeq);
 };
 
 class PickUpOrderSeqInfo
