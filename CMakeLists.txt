@@ -129,6 +129,8 @@ add_executable(csp_solver_node src/generate_plans.cpp)
  )
 
 target_link_libraries(cobot_node
+   robot_negotiation_environment
+   robot_negotiation_csp_solver
    ${catkin_LIBRARIES}
  )
 
@@ -139,9 +141,9 @@ target_link_libraries(environment_node
  )
 
  target_link_libraries(csp_solver_node
-  robot_negotiation_environment 
   robot_negotiation_csp_solver
-   ${catkin_LIBRARIES}
+  robot_negotiation_environment 
+  ${catkin_LIBRARIES}
    ${Boost_LIBRARIES}
  )
 
