@@ -3,7 +3,9 @@
 
 ccobot::ccobot(uint cobotId){
 	id = cobotId;
-	task_client = nh.serviceClient<robot_negotiation::GetTasks>("../task_generator");
+	std::cout<<"Attempting to call service\n";
+	task_client = nh.serviceClient<robot_negotiation::GetTasks>("/task_generator");
+	std::cout<<"Service attempted\n";
 	if (task_client.call(srv))
 	{
 		ROS_INFO("Cobot tasks list populated");
@@ -33,7 +35,7 @@ double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 {
 
 	std::string s;
-	//DeliveryOrderSeq a(1,s,0.0,0.0);
+	DeliveryOrderSeq a(1,s,0.0,0.0);
 	for(int i =0; i < plan.size(); i++)
 	{
 		//if(plan[i].m_iCobotNum == id) {a.set(plan[i]);  break;}
@@ -48,12 +50,26 @@ double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
         return 0;	
 }
 
-//int count_missed_deadlines(a.m_dExpectedTime,tasks)
-//{
-//	return 0;
-//}
-
-
+int count_missed_deadlines(double start, std::vector<robot_negotiation::Task> tasks)  //given the start time of the schedule, how many deadlines are missed in the best case?
+{
+	int count = 0;
+	std::vector<double> deadlines;
+	std::vector<double> end_times;
+	double last_end = start;
+	double curr_end = start;
+	//store end times for each task and compare them to deadlines of each task
+	for(int i = 0; i < tasks.size(); i++)
+	{
+		curr_end = last_end + tasks[i].est_time;
+		end_times.push_back(curr_end);
+		std::cout<<curr_end<<",";
+		deadlines.push_back(tasks[i].deadline);
+		std::cout<<tasks[i].deadline<<std::endl;
+		if(curr_end > tasks[i].deadline) count += 1;
+		last_end = curr_end; 
+	}
+	return count;
+}
 
 
 int main(int argc, char **argv){
@@ -66,3 +82,26 @@ int main(int argc, char **argv){
 	ros::spin();
 	return 0;
 }
+
+/*int main()
+{
+	robot_negotiation::TaskList tasks;
+    robot_negotiation::Task t1;
+    t1.est_time = 1;
+    t1.deadline = 3;
+    robot_negotiation::Task t2;
+    t2.est_time = 3;
+    t2.deadline = 3;
+    robot_negotiation::Task t3;
+    t3.est_time = 2;
+    t3.deadline = 3;
+    robot_negotiation::Task t4;
+    t4.est_time = 4;
+    t4.deadline = 10;
+    tasks.task_list.push_back(t1);
+    tasks.task_list.push_back(t2);
+    tasks.task_list.push_back(t3);
+    tasks.task_list.push_back(t4);
+    std::cout<<count_missed_deadlines(1, tasks.task_list)<<std::endl;
+	return 0;
+}*/
