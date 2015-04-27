@@ -1,4 +1,5 @@
 #include <cobot.h>
+#include <CSPSolver.h>
 
 ccobot::ccobot(uint cobotId){
 	id = cobotId;
@@ -31,14 +32,21 @@ ccobot::ccobot(uint cobotId){
 double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 {
 	std::string s;
-	CSPSolver::DeliveryOrderSeq a(1,s,0.0,0.0);
+	DeliveryOrderSeq a(1,s,0.0,0.0);
 	for(int i =0; i < plan.size(); i++)
 	{
-		if(plan[i].m_iCobotNum == id) {a = plan[i];  break;}
+		if(plan[i].m_iCobotNum == id) {a.set(plan[i]);  break;}
 	}
+	count_missed_deadlines(a.m_dExpectedTime,tasks);
         return 0;	
-
 }
+
+int count_missed_deadlines(a.m_dExpectedTime,tasks)
+{
+	
+}
+
+
 
 
 int main(int argc, char **argv){
