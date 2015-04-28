@@ -60,7 +60,7 @@ int main(int argc, char** argv)
         if (planning_client.call(srv_planning))
         {
             ROS_INFO("planning complete");
-            //std::cout<<tasks.task_list[0];
+            std::cout<<srv_planning.response.plans[0];
         }
         else
         {

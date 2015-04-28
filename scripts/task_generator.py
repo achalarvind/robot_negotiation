@@ -65,6 +65,7 @@ class task:
 	location = None
 	deadline = None
 	est_time =  None
+		
 
 def generate_tasks(): #generates a list of tasks for one Cobot which contains object_id 
 	global horizon
@@ -75,6 +76,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	global nObjects
 
 
+	objects=["A","B","C"]
 
 	totalTime = 0
 	task_list = []
@@ -82,7 +84,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	while True:
 		# print("distance is",get_distance(int(42),int(waitingNode)))
 
-		object_id = str(randint(0,nObjects-1))
+		object_id = objects[randint(0,nObjects-1)]
 		location = vKeys[randint(0,nVertices-1)]
 		#get the estimated task execution time (for now Euclidean distance from reference point
 		distance = getdistance(location,waitingNode)
@@ -116,9 +118,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	return task_list
 
 def generate_tasks_handler(req):
-	print "calling service"
 	tasks=generate_tasks()
-	print "service called"
 	task_list=TaskList()
 	for i in xrange(len(tasks)):
 		t = Task()
