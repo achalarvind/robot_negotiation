@@ -50,6 +50,7 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 	obSolver.m_d_WorldStartTime=(double)now;
 
 	std::unordered_map<double, std::vector<DeliveryOrderSeq>> umapResults= obSolver.GenerateCobotOrder(vecTasks);
+	res.greedy_makespan=obSolver.m_d_Greedy_MakeSpan;
 
 	robot_negotiation::Plan plan;
 

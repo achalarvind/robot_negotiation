@@ -6,7 +6,6 @@
 
 #define LARGE_TREE   
 
-
 using namespace std;
 
 void GenerateRandomNumbers(int iMaxValue, int iNumOfValues, std::vector<int>* pvecRandom);
@@ -34,7 +33,7 @@ TaskInfo::TaskInfo(double dEndTime, Block obBlock, int iCobotNum)
 	m_iCobotNum = iCobotNum;
 }
 
-DeliveryOrderSeq::DeliveryOrderSeq(int iCobotNum, std::string strLoc, double dTime, double dDeadLine)
+DeliveryOrderSeq::DeliveryOrderSeq(int iCobotNum, std::string strLoc, double dTime , double dDeadLine)
 {
 	m_iCobotNum = iCobotNum;
 	m_strLoc = strLoc;
@@ -84,28 +83,6 @@ int CSPSolver::ReturnDropOfLocation(std::string stLoc)
 	else{return 2;}
 }
 
-double CSPSolver::ReturnTimeToPlaceObject(std::string stCobotType, int iTableNum)
-{
-	if (0 == iTableNum)
-	{
-		if ("SMALL" == stCobotType) { return  TIME_TO_PLACE_OBJECT_TABLE_0_SMALL;}
-		else if ("MEDIUM" == stCobotType) {	return TIME_TO_PLACE_OBJECT_TABLE_0_MEDIUM;}
-		else { return TIME_TO_PLACE_OBJECT_TABLE_0_LARGE; }
-	}
-	else if (1 == iTableNum)
-	{
-		if ("SMALL" == stCobotType) { return  TIME_TO_PLACE_OBJECT_TABLE_1_SMALL; }
-		else if ("MEDIUM" == stCobotType) { return TIME_TO_PLACE_OBJECT_TABLE_1_MEDIUM; }
-		else { return TIME_TO_PLACE_OBJECT_TABLE_1_LARGE; }
-	}
-	else
-	{
-		if ("SMALL" == stCobotType) { return  TIME_TO_PLACE_OBJECT_TABLE_2_SMALL; }
-		else if ("MEDIUM" == stCobotType) { return TIME_TO_PLACE_OBJECT_TABLE_2_MEDIUM; }
-		else { return TIME_TO_PLACE_OBJECT_TABLE_2_LARGE; }
-	}
-}
-
 #ifdef ROS_CODE
 std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCobotOrder(std::vector<TaskInfo> vecCobotTasks)
 #else
@@ -119,7 +96,6 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 	m_vecTasks.clear();
 	m_vecEnvironments.clear();
 
-	m_d_Greedy_MakeSpan = -1;
 	m_vecTasks = vecCobotTasks;
 	
 	m_vecEnvironments = c_m_vecEnvironments;
@@ -165,8 +141,6 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 		stSol = TraverseGraph(0, m_c_iStartLocation, m_c_dStartTime);
 #endif
 	}
-
-	m_d_Greedy_MakeSpan = m_vecCobotOrder[m_vecCobotOrder.size() - 1].m_dExpectedTime;
 
 	PopulateSequenceInfo();
 
@@ -289,8 +263,6 @@ std::pair<bool, SOLUTION> CSPSolver::SelectPickUpLocation(Block obBlock, int iCo
 		Location stLoc;  //Dummy initialization
 
 		dDistance_At_Table = m_vecEnvironments[iLocation].GetNearestObjectLocation(obBlock, &stLoc);
-
-		dDistance_At_Table = dDistance_At_Table * (1 + (MAX_DELAY_TIME_PROP_DISTANCE / 2));          // Adds delay for picking
 		
 		if (MAX_DIST_VALUE == dDistance_At_Table)
 		{
@@ -405,7 +377,7 @@ void CSPSolver::Perform3Swap()
 
 	if (m_bFeasibility)
 	{
-		InsertSequenceIntoCandidatePool(m_vecCobotOrder[iNumOfCobots - 1].m_dExpectedTime, &m_vecCobotOrder);
+		InsertSequenceIntoCandidatePool(m_vecCobotOrder[iNumOfCobots - 1].m_dExpectedTime, m_vecCobotOrder);
 	}
 	else
 	{
@@ -419,7 +391,7 @@ void CSPSolver::Perform3Swap()
 			}
 		}
 
-		InsertSequenceIntoCandidatePool( -1 * dFeasibleCobots , &m_vecCobotOrder);
+		InsertSequenceIntoCandidatePool( -1 * dFeasibleCobots , m_vecCobotOrder);
 	}
 
 	if (1 == iNumOfCobots)
@@ -441,7 +413,7 @@ void CSPSolver::Perform3Swap()
 
 	if (iNumOfCobots > 15)
 	{
-		iMaxIterations = 1000;
+		iMaxIterations = 2000;
 	}
 	else if (iNumOfCobots == 2)
 	{
@@ -566,11 +538,11 @@ void CSPSolver::CheckForLocalImprovement(std::vector<int> vecRandom, std::vector
 
 	if (m_bFeasibility)
 	{
-		InsertSequenceIntoCandidatePool(dTime, &vecDelivery);
+		InsertSequenceIntoCandidatePool(dTime, vecDelivery);
 	}
 	else
 	{
-		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, &vecDelivery);
+		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, vecDelivery);
 	}
 
 	CheckForLocalImprovementGreedyStartegy(&vecDelivery);
@@ -617,12 +589,10 @@ void CSPSolver::CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrder
 		}
 
 		vecEnv.at(std::get<1>(stBestResult)).Remove_Element(it->second.m_obBlock, std::get<2>(stBestResult));
-		
-		//Greedy updates many fields
 		vecGreedyDelivery[iCount].m_dExpectedTime = std::get<0>(stBestResult);
 		iBaxterStartLocation = iBestDest;
 		vecGreedyDelivery[iCount].m_strLoc = ReturnDropOfLocation(std::get<1>(stBestResult));
-		
+
 		if (m_bFeasibility)
 		{
 			if (vecGreedyDelivery[iCount].m_dExpectedTime > it->second.m_dDeadline) 
@@ -639,11 +609,11 @@ void CSPSolver::CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrder
 
 	if (m_bFeasibility)
 	{
-		InsertSequenceIntoCandidatePool(vecGreedyDelivery[vecGreedyDelivery.size()-1].m_dExpectedTime, &vecGreedyDelivery);		
+		InsertSequenceIntoCandidatePool(vecGreedyDelivery[vecGreedyDelivery.size()-1].m_dExpectedTime, vecGreedyDelivery);		
 	}
 	else
 	{
-		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, &vecGreedyDelivery);		
+		InsertSequenceIntoCandidatePool(-1 * dFeassibleCobots, vecGreedyDelivery);		
 	}
 }
 
@@ -659,7 +629,6 @@ std::tuple<double , int , Location> CSPSolver::GetPairWiseShortestCosts(std::vec
 		dTime = (dCurrToTable / BAXTER_TRAV_SPEED);
 
 		dDistance_At_Table = pvecEnvVars->at(iTable).GetNearestObjectLocation(obBlock, &stLoc);
-		dDistance_At_Table = dDistance_At_Table * (1 + (MAX_DELAY_TIME_PROP_DISTANCE / 2));          // Adds delay for picking
 
 		if (MAX_DIST_VALUE == dDistance_At_Table)
 		{
@@ -687,57 +656,7 @@ std::tuple<double , int , Location> CSPSolver::GetPairWiseShortestCosts(std::vec
 	return stResult;
 }
 
-double CSPSolver::ReturnMakeSpanForSchedule(std::vector<DeliveryOrderSeq>* pvecDeliverySequence)
-{
-	std::vector<Environment> vecEnv(c_m_vecEnvironments);
-
-	std::vector<DeliveryOrderSeq> vecGreedyDelivery = *pvecDeliverySequence;
-
-	std::tuple<double, int, Location> stResult;
-
-	int iBaxterStartLocation = m_c_iStartLocation;
-	int iBestDest;
-	double dCurrTime;
-
-	double dFeassibleCobots = 0;
-
-	for (unsigned int iCount = 0; iCount < vecGreedyDelivery.size(); iCount++)
-	{
-		std::unordered_map<int, CompleteSeqInfo>::iterator it = m_umapCompleteSeqInfo.find(vecGreedyDelivery[iCount].m_iCobotNum);
-		std::tuple<double, int, Location> stBestResult = std::make_tuple(MAX_DIST_VALUE, 0, Location()); //Dummy initialization  
-
-		if (0 == iCount) { dCurrTime = m_c_dStartTime; }
-		else { dCurrTime = vecGreedyDelivery[iCount - 1].m_dExpectedTime; }
-
-		for (int iStart = 0; iStart < 3; iStart++)
-		{
-			double dTravCost = m_obGeometry.ReturnTravDistance(iBaxterStartLocation, iStart);
-
-			for (int iDest = 0; iDest < 3; iDest++)
-			{
-				stResult = GetPairWiseShortestCosts(&vecEnv, it->second.m_obBlock, iStart, iDest, dCurrTime);
-				std::get<0>(stResult) = std::get<0>(stResult) +dTravCost;
-
-				if (std::get<0>(stBestResult) > std::get<0>(stResult))
-				{
-					stBestResult = stResult;
-					iBestDest = iDest;
-				}
-			}
-		}
-
-		vecEnv.at(std::get<1>(stBestResult)).Remove_Element(it->second.m_obBlock, std::get<2>(stBestResult));
-
-		//Greedy updates many fields
-		vecGreedyDelivery[iCount].m_dExpectedTime = std::get<0>(stBestResult);
-		iBaxterStartLocation = iBestDest;
-		vecGreedyDelivery[iCount].m_strLoc = ReturnDropOfLocation(std::get<1>(stBestResult));		
-	}
-
-	return vecGreedyDelivery[vecGreedyDelivery.size() - 1].m_dExpectedTime;
-}
-
-void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<DeliveryOrderSeq> *pvecDelivery)
+void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<DeliveryOrderSeq> vecDelivery)
 {
 	std::vector<double> vecKeys;
 
@@ -761,12 +680,12 @@ void CSPSolver::InsertSequenceIntoCandidatePool(double dTime, std::vector<Delive
 
 	if (iNumOfCandidates < 5)
 	{
-		m_umap_Candidates.insert(std::make_pair(dTime + ((double)(rand() % 100) / 10000), *pvecDelivery));
+		m_umap_Candidates.insert(std::make_pair(dTime + ((double)(rand() % 100) / 10000), vecDelivery));
 	}
 	else if (dTime < dLargestKey)
 	{
 		m_umap_Candidates.erase(dLargestKey);
-		m_umap_Candidates.insert(std::make_pair(dTime + ((double)(rand() % 100) / 10000), *pvecDelivery));
+		m_umap_Candidates.insert(std::make_pair(dTime + ((double)(rand() % 100) / 10000), vecDelivery));
 	}
 }
 
@@ -805,10 +724,7 @@ double CSPSolver::ReturnKeyOfBestCandidate()
 
 double CSPSolver::ReturnCurrentTime()
 {
-	time_t  now = time(0);
-	
-	double dTime = (double)(now) - m_d_WorldStartTime;
-	return dTime;
+	return 0;
 }
 
 bool CSPSolver::CheckIfAllVarsInitialized()
