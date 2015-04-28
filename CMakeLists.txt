@@ -119,7 +119,7 @@ add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
 add_executable(cobot_node src/cobot.cpp)
 add_executable(environment_node src/table.cpp)
 add_executable(csp_solver_node src/generate_plans.cpp)
-
+add_executable(test_node src/algorithmTesting.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -147,6 +147,12 @@ target_link_libraries(environment_node
 
  target_link_libraries(csp_solver_node
   robot_negotiation_lib 
+   ${catkin_LIBRARIES}
+   ${Boost_LIBRARIES}
+ )
+
+target_link_libraries(test_node
+  robot_negotiation_lib
    ${catkin_LIBRARIES}
    ${Boost_LIBRARIES}
  )

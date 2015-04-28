@@ -8,6 +8,11 @@
 #include <sstream>
 #include "ros/ros.h"
 #include "robot_negotiation/GetDistance.h"
+#include "robot_negotiation/DeSerializeEnvironmentPlan.h"
+#include "robot_negotiation/Action.h"
+#include "robot_negotiation/Plan.h"
+#include "robot_negotiation/GetTasks.h"
+
 // #include "robot_negotiation/GetDistanceStochastic.h"
 #include <CobotQueueHandler.h>
 
@@ -15,8 +20,7 @@ using namespace std;
 
 const int NCobots = 10;
 
-
-
+std::string baxter_location;
 
 int main(int argc, char** argv)
 {
@@ -30,29 +34,34 @@ int main(int argc, char** argv)
     }
     cobotQueue queue(cobotIds,NCobots);
 
+    ros::ServiceClient planning_client=n.serviceClient<robot_negotiation::DeSerializeEnvironmentPlan>("/deserialize_environment");
+    robot_negotiation::DeSerializeEnvironmentPlan srv_planning;
+
     //gather first task of each cobot
-    std::vector<robot_negotiation::Action> tasks_to_plan;
     for(int i = 0; i < NCobots; i++)
     {
-    	Action a;
+    	robot_negotiation::Action a;
     	a.cobot_id = i;
     	a.object_type = queue.cobots[i].tasks[0].object_id;
     	a.deadline = queue.cobots[i].tasks[0].deadline;
-    	tasks_to_plan.push_back(a);
+    	srv_planning.request.plan.push_back(a);
     }
+    srv_planning.request.baxter_location=baxter_location;
+    srv_planning.request.start_time=ros::Time::now().toSec()+10.0f;
 
+    if (planning_client.call(srv_planning))
+    {
+        ROS_INFO("planning complete");
+        // std::cout<<tasks.task_list[0];
+    }
+    else
+    {
+        ROS_ERROR("Failed to call service deserialize_environment. No plan generated");
+    }   
 
-
-
-
-
-
-
-
-
-
-
-    task_client = nh.serviceClient<robot_negotiation::GetTasks>("/task_generator");
+    robot_negotiation::TaskList tasks;
+    robot_negotiation::GetTasks srv;
+    ros::ServiceClient task_client = n.serviceClient<robot_negotiation::GetTasks>("/task_generator");
 	std::cout<<"Service attempted\n";
 	if (task_client.call(srv))
 	{
@@ -69,7 +78,6 @@ int main(int argc, char** argv)
 
 	ROS_INFO("started_node");
     ros::spin();
-	delete(pWorld);
 
 	return 1;
 }
