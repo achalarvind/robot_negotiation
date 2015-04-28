@@ -34,9 +34,8 @@ class DeliveryOrderSeq
 		std::string m_strLoc;
 		double m_dExpectedTime;
 		double m_dDeadLine;
-
-		DeliveryOrderSeq(int , std::string , double , double);
-		void set(DeliveryOrderSeq);
+	
+		DeliveryOrderSeq(int, std::string, double, double);
 };
 
 class PickUpOrderSeqInfo
