@@ -8,6 +8,7 @@
 #include <boost/serialization/vector.hpp>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 #define ROS_CODE
 
@@ -103,7 +104,7 @@ class CSPSolver
 		std::tuple<double, int, Location> GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock, int iCurr, int iDest , double dCurrTime);
 	
 public:
-	
+		double m_d_WorldStartTime;
 	    CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
 
 #ifdef ROS_CODE	

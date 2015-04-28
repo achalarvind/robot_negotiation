@@ -37,13 +37,9 @@ int main(int argc, char** argv)
     }
     //cobotQueue queue(cobotIds,NCobots);
 
-    std::cout<<"Debug1\n";
-
     for(int nThread = 0; nThread < NThreads; nThread++){
         ros::ServiceClient planning_client=n.serviceClient<robot_negotiation::DeSerializeEnvironmentPlan>("/csp_solver/deserialize_environment");
         robot_negotiation::DeSerializeEnvironmentPlan srv_planning;
-
-        std::cout<<"Debug2\n";
 
         //gather first task of each cobot
         for(int i = 0; i < NCobots; i++)
@@ -59,14 +55,52 @@ int main(int argc, char** argv)
 
         if (planning_client.call(srv_planning))
         {
-            ROS_INFO("planning complete");
-            //std::cout<<tasks.task_list[0];
+            ROS_INFO("CSP solver called and plans generated");
+            
+            std::vector<std::vector<DeliveryOrderSeq>> plans; 
+            std::vector<DeliveryOrderSeq> plan;
+
+            for(int j = 0; j < srv_planning.response.plans.size(); j++)
+            {
+                plan.clear();
+                for(int k = 0; k < srv_planning.response.plans[j].plan.size(); k++)
+                {
+                    DeliveryOrderSeq a(srv_planning.response.plans[j].plan[k].cobot_id, srv_planning.response.plans[j].plan[k].location, srv_planning.response.plans[j].plan[k].expected_completion_time, 0.0f);
+                    plan.push_back(a);
+                }       
+                plans.push_back(plan);
+            }
+            ROS_INFO("Starting the voting process");
+            
+            std::vector<std::vector<double>> voteResult = queue.collect_votes(plans);
+
+            std::vector< std::vector<double> > voteResult_t(voteResult[0].size());
+
+            for (int i = 0; i < voteResult[0].size(); i++)
+            {
+                std::vector<double> temp(voteResult.size());
+                voteResult_t[i] = temp;
+            }
+
+            for (int i = 0; i < voteResult.size(); i++)
+            {
+
+                for (int j = 0; j < voteResult[0].size(); j++)
+                {
+                    voteResult_t[j][i] = voteResult[i][j];
+                }
+            }
+
+            ROS_INFO("Vote Result-Best plan: %d",queue.send_best_plan(voteResult_t, voteResult_t.size()));
+
         }
         else
         {
             ROS_ERROR("Failed to call service /csp_solver/deserialize_environment. No plan generated");
         }   
     }
+
+
 
 
     ros::spin();

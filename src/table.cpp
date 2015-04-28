@@ -4,11 +4,9 @@ bool serializeEnvironment(robot_negotiation::SerializeEnvironment::Request  &req
 	robot_negotiation::SerializeEnvironment::Response &res,
 	std::vector<Environment*> pEnv, std::string *file_names){
 	for(int i=0;i<pEnv.size();i++){
-		ROS_INFO("%s",file_names[i].c_str());
+		ROS_INFO("Created %s",file_names[i].c_str());
 		std::ofstream ofs(file_names[i].c_str(), std::ofstream::out);
-		ROS_INFO("Debug2");
 		boost::archive::text_oarchive oa(ofs);
-		ROS_INFO("Debug3");
 		oa & *(pEnv[i]);
 		ofs.close();
 	}
@@ -58,7 +56,7 @@ int main(int argc, char** argv){
 	ros::NodeHandle n("~");
 	ROS_INFO("Environment ready");
 
-	std::string filenames[]={"table0.env","table1.env","table2.env"};
+	std::string filenames[]={"/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env"};
 
 	ros::ServiceServer add_object = n.advertiseService<robot_negotiation::AddObject::Request, robot_negotiation::AddObject::Response>("add_object", boost::bind(addObject, _1, _2, pEnv));
 	ros::ServiceServer remove_object = n.advertiseService<robot_negotiation::RemoveObject::Request, robot_negotiation::RemoveObject::Response>("remove_object", boost::bind(removeObject, _1, _2, pEnv));

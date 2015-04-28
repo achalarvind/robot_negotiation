@@ -3,12 +3,10 @@
 
 ccobot::ccobot(uint cobotId){
 	id = cobotId;
-	std::cout<<"Attempting to call service\n";
 	task_client = nh.serviceClient<robot_negotiation::GetTasks>("/task_generator");
-	std::cout<<"Service attempted\n";
 	if (task_client.call(srv))
 	{
-		ROS_INFO("Cobot tasks list populated");
+		ROS_INFO("Cobot %d spawned and tasks list populated",cobotId);
 		tasks=srv.response.tasks;
 		// std::cout<<tasks.task_list[0];
 	}
@@ -43,9 +41,7 @@ int count_missed_deadlines(double start, std::vector<robot_negotiation::Task> re
 	{
 		curr_end = last_end + rem_tasks[i].est_time;
 		end_times.push_back(curr_end);
-		std::cout<<curr_end<<",";
 		deadlines.push_back(rem_tasks[i].deadline);
-		std::cout<<rem_tasks[i].deadline<<std::endl;
 		if(curr_end > rem_tasks[i].deadline) count += 1;
 		last_end = curr_end; 
 	}

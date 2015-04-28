@@ -724,7 +724,9 @@ double CSPSolver::ReturnKeyOfBestCandidate()
 
 double CSPSolver::ReturnCurrentTime()
 {
-	return 0;
+	time_t now=time(0);
+	double dTime=(double)(now)-m_d_WorldStartTime;
+	return dTime;
 }
 
 bool CSPSolver::CheckIfAllVarsInitialized()
