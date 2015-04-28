@@ -2,7 +2,7 @@
 #include "../include/CobotQueueHandler.h"
 #include <algorithm>
 
-double variance(std::vector<uint> x,double mean)
+double variance(std::vector<double> x,double mean)
 {
 	double variance = 0;
 	for(int i =0; i < x.size(); i++)
@@ -28,7 +28,7 @@ bool cobotQueue::add_cobot(uint id)
 {
 	cobotIds.push_back(id);
 	ccobot c(id);
-	cobotQueue.push_back(c); //hack
+	cobots.push_back(c); //hack
 	return true;
 }
 		
@@ -48,24 +48,24 @@ bool cobotQueue::remove_cobot(uint id)
 
 bool cobotQueue::initiate_vote() // Broadcasts a message to all CoBots in Queue to submit vote
 {
-	DeliveryOrderSeq a(1,s,0.0,0.0);
+	//DeliveryOrderSeq a(1,s,0.0,0.0);
 	return false;
 }
 
-std::vector< std::vector<uint> > cobotQueue::collect_votes(std::vector<std::vector<DeliveryOrderSeq>> plan_list) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
+std::vector< std::vector<double> > cobotQueue::collect_votes(std::vector<std::vector<DeliveryOrderSeq>> plan_list) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
 {
     std::vector< std::vector<double> > votesTable;
-    for (int i = 0; i < cobotQueue.size(); i++)
+    for (int i = 0; i < cobots.size(); i++)
     {
-    	votesTable.push_back(cobotQueue[i].vote());
+    	votesTable.push_back(cobots[i].vote(plan_list));
     }
 	return votesTable;
 }
 
-std::vector< std::vector<uint> > cobotQueue::collect_votes(std::vector<robot_negotiation::ResultTasks> plan_list) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
+std::vector< std::vector<double> > cobotQueue::collect_votes(std::vector<std::vector<robot_negotiation::ResultTask>> plan_list) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
 {
-    std::vector<DeliveryOrderSeq> > Plan;
-    std::vector<std::vector<DeliveryOrderSeq>>> vecPlan;
+    std::vector<DeliveryOrderSeq> Plan;
+    std::vector<std::vector<DeliveryOrderSeq>> vecPlan;
 
 	int m_iCobotNum;
 	std::string m_strLoc;
@@ -92,7 +92,7 @@ std::vector< std::vector<uint> > cobotQueue::collect_votes(std::vector<robot_neg
 	return collect_votes(vecPlan);
 }
 
-int cobotQueue::send_best_plan(std::vector< std::vector<uint> > votesTable, uint nPlans) // Evaluates votes and send final plan id to Baxter
+int cobotQueue::send_best_plan(std::vector< std::vector<double> > votesTable, uint nPlans) // Evaluates votes and send final plan id to Baxter
 {
 	//create an array of costs for every plan; return plan with lower average cost and highest variance 
 
@@ -121,13 +121,13 @@ int cobotQueue::send_best_plan(std::vector< std::vector<uint> > votesTable, uint
 	return best_plan;
 }
 
-int main(){
- 	//std::vector< std::vector<uint> > votesTable {{10,9,8,7,6},{1,2,3,4},{10,0,0,0}};
-    //std::cout<<variance({1,2,3},2)<<std::endl;
- 	//votesTable[0] = {10,9,8,7,6};
-	//votesTable[1] = {9,10,7,8,6};
-	//votesTable[2] = {1,2,3,4};  
-    //cobotQueue c({},3);
-    //std::cout<<c.send_best_plan(votesTable,3)<<std::endl;
-	return 0;
-}
+// int main(){
+//  	//std::vector< std::vector<uint> > votesTable {{10,9,8,7,6},{1,2,3,4},{10,0,0,0}};
+//     //std::cout<<variance({1,2,3},2)<<std::endl;
+//  	//votesTable[0] = {10,9,8,7,6};
+// 	//votesTable[1] = {9,10,7,8,6};
+// 	//votesTable[2] = {1,2,3,4};  
+//     //cobotQueue c({},3);
+//     //std::cout<<c.send_best_plan(votesTable,3)<<std::endl;
+// 	return 0;
+// }

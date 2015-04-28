@@ -112,11 +112,13 @@ include_directories(${Boost_INCLUDE_DIR})
 add_library(robot_negotiation_lib
   src/Environment.cpp
   src/CSPSolver.cpp
+  src/CobotQueueHandler.cpp
+  src/cobot.cpp
 )
 
 ## Declare a cpp executable
 add_executable(world_node src/Wrapper.cpp src/WorldMap.cpp)
-add_executable(cobot_node src/cobot.cpp)
+add_executable(cobot_node src/cobot_robot.cpp)
 add_executable(environment_node src/table.cpp)
 add_executable(csp_solver_node src/generate_plans.cpp)
 add_executable(test_node src/algorithmTesting.cpp)

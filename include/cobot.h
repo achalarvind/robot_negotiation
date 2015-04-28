@@ -16,11 +16,12 @@ class ccobot{
 		int state;
 		int location;
 		bool has_object;
-		robot_negotiation::TaskList tasks;
+
 
 	public:
 		ccobot(uint cobotId);
 
+		robot_negotiation::TaskList tasks;
 		std::vector<double> vote(std::vector<std::vector<DeliveryOrderSeq>> plan_list);
 		double plan_cost(std::vector<DeliveryOrderSeq> plan);
 		//int count_missed_deadlines(double,robot_negotiation::TaskList);

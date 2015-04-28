@@ -14,7 +14,8 @@
 #include "robot_negotiation/GetTasks.h"
 
 // #include "robot_negotiation/GetDistanceStochastic.h"
-#include <CobotQueueHandler.h>
+#include "CobotQueueHandler.h" 
+
 
 using namespace std;
 
@@ -42,8 +43,8 @@ int main(int argc, char** argv)
     {
     	robot_negotiation::Action a;
     	a.cobot_id = i;
-    	a.object_type = queue.cobots[i].tasks[0].object_id;
-    	a.deadline = queue.cobots[i].tasks[0].deadline;
+    	a.object_type = queue.cobots[i].tasks.task_list[0].object_id;
+    	a.deadline = queue.cobots[i].tasks.task_list[0].deadline;
     	srv_planning.request.plan.push_back(a);
     }
     srv_planning.request.baxter_location=baxter_location;
