@@ -106,6 +106,7 @@ class CSPSolver
 public:
 	
 	    double m_d_WorldStartTime;
+		double m_d_Greedy_MakeSpan;
 	    CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
 
 #ifdef ROS_CODE	
