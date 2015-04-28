@@ -66,6 +66,6 @@ int main(int argc, char **argv){
 	std::string filenames[]={"table0.env","table1.env","table2.env"};
 
 	ros::ServiceServer deserialize_environment_plan = n.advertiseService<robot_negotiation::DeSerializeEnvironmentPlan::Request, robot_negotiation::DeSerializeEnvironmentPlan::Response>("deserialize_environment", boost::bind(deserializeEnvironment, _1, _2, filenames));
-
+	
 	ros::spin();
 }

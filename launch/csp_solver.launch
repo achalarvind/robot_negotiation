@@ -1,10 +1,4 @@
 <launch>
-  <node ns="0" name="csp0" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="1" name="csp1" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="2" name="csp2" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="3" name="csp3" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="4" name="csp4" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="5" name="csp5" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="6" name="csp6" pkg="robot_negotiation" type="csp_solver_node" />
-  <node ns="7" name="csp7" pkg="robot_negotiation" type="csp_solver_node" />
+  <node name="csp0" pkg="robot_negotiation" type="csp_solver_node" />
 </launch>
+

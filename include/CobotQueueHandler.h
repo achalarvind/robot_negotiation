@@ -14,6 +14,7 @@ class cobotQueue{
 
 		std::vector<ccobot> cobots; //hack
         //Constructor
+        cobotQueue();
 		cobotQueue(std::vector<uint> ,uint);
 
         //Queue Manager

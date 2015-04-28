@@ -12,6 +12,11 @@ double variance(std::vector<double> x,double mean)
 	return variance/x.size();
 }
 
+cobotQueue::cobotQueue()
+{
+	;
+}
+
 cobotQueue::cobotQueue(std::vector<uint> ids, uint maxN)
 {
 	cobotIds = ids;
