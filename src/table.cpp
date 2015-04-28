@@ -56,7 +56,9 @@ int main(int argc, char** argv){
 	ros::NodeHandle n("~");
 	ROS_INFO("Environment ready");
 
-	std::string filenames[]={"/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env"};
+	std::string filenames[]={"/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table0.env","/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table1.env","/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table2.env"};
+
+	//std::string filenames[]={"/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env"};
 
 	ros::ServiceServer add_object = n.advertiseService<robot_negotiation::AddObject::Request, robot_negotiation::AddObject::Response>("add_object", boost::bind(addObject, _1, _2, pEnv));
 	ros::ServiceServer remove_object = n.advertiseService<robot_negotiation::RemoveObject::Request, robot_negotiation::RemoveObject::Response>("remove_object", boost::bind(removeObject, _1, _2, pEnv));
