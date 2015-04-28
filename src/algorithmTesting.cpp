@@ -15,11 +15,12 @@
 
 // #include "robot_negotiation/GetDistanceStochastic.h"
 #include "CobotQueueHandler.h" 
-
+    
 
 using namespace std;
 
 const int NCobots = 10;
+const int NThreads = 1;
 
 std::string baxter_location;
 
@@ -27,44 +28,47 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "test");
  	ros::NodeHandle n("~");
-
     //create multiple cobots in queue
- 
     std::vector<uint> cobotIds;
+    cobotQueue queue;
     for(int i = 0; i < NCobots; i++)
     {
-    	cobotIds.push_back(i);
+        queue.add_cobot(i);
     }
-    cobotQueue queue(cobotIds,NCobots);
+    //cobotQueue queue(cobotIds,NCobots);
 
-    ros::ServiceClient planning_client=n.serviceClient<robot_negotiation::DeSerializeEnvironmentPlan>("/deserialize_environment");
-    robot_negotiation::DeSerializeEnvironmentPlan srv_planning;
+    std::cout<<"Debug1\n";
 
-    //gather first task of each cobot
-    for(int i = 0; i < NCobots; i++)
-    {
-        std::cout<<queue.cobots[i].tasks.task_list[0].object_id<<endl;
-    	// robot_negotiation::Action a;
-    	// a.cobot_id = i;
-    	// a.object_type = queue.cobots[i].tasks.task_list[0].object_id;
-    	// a.deadline = queue.cobots[i].tasks.task_list[0].deadline;
-    	// srv_planning.request.plan.push_back(a);
+    for(int nThread = 0; nThread < NThreads; nThread++){
+        ros::ServiceClient planning_client=n.serviceClient<robot_negotiation::DeSerializeEnvironmentPlan>("/csp_solver/deserialize_environment");
+        robot_negotiation::DeSerializeEnvironmentPlan srv_planning;
+
+        std::cout<<"Debug2\n";
+
+        //gather first task of each cobot
+        for(int i = 0; i < NCobots; i++)
+        {
+        	robot_negotiation::Action a;
+        	a.cobot_id = i;
+        	a.object_type = queue.cobots[i].tasks.task_list[0].object_id;
+        	a.deadline = queue.cobots[i].tasks.task_list[0].deadline;
+        	srv_planning.request.plan.push_back(a);
+        }
+        srv_planning.request.baxter_location=baxter_location;
+        srv_planning.request.start_time=ros::Time::now().toSec()+10.0f;
+
+        if (planning_client.call(srv_planning))
+        {
+            ROS_INFO("planning complete");
+            //std::cout<<tasks.task_list[0];
+        }
+        else
+        {
+            ROS_ERROR("Failed to call service /csp_solver/deserialize_environment. No plan generated");
+        }   
     }
-    // srv_planning.request.baxter_location=baxter_location;
-    // srv_planning.request.start_time=ros::Time::now().toSec()+10.0f;
-
-    // if (planning_client.call(srv_planning))
-    // {
-    //     ROS_INFO("planning complete");
-    //     // std::cout<<tasks.task_list[0];
-    // }
-    // else
-    // {
-    //     ROS_ERROR("Failed to call service deserialize_environment. No plan generated");
-    // }   
 
 
-	ROS_INFO("started_node");
     ros::spin();
 
 	return 1;

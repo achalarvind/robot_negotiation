@@ -12,8 +12,8 @@ from math import *
 from robot_negotiation.srv import *
 from robot_negotiation.msg import *
 
-horizon = 100 #units of time for which we are running the simulation
-avSpeed = 10 #Cobot average speed used for task duration information
+horizon = 3600 #units of time for which we are running the simulation
+avSpeed = 0.1 #Cobot average speed used for task duration information
 nCobots = 3
 maxSubLengthFactor = 5 #maximum ratio of tasks which will be assigned to the same deadline
 
@@ -85,7 +85,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 		object_id = str(randint(0,nObjects-1))
 		location = vKeys[randint(0,nVertices-1)]
 		#get the estimated task execution time (for now Euclidean distance from reference point
-		distance = getdistance(11,1)
+		distance = getdistance(location,waitingNode)
 		est_time = 2*distance.distance/avSpeed
 		totalTime += est_time
 		if totalTime > horizon: break
@@ -99,9 +99,9 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	cursor = 0 #a cursor on task index
 	project_length = 0 #stores minimum time to complete so far
 	nTasks = len(task_list)
-	maxSubLength = nTasks/maxSubLengthFactor #maximum number of tasks assigned to same deadline
-	print "maxSubLength:" + str(maxSubLength)
-	print "nTasks:" + str(nTasks)
+	maxSubLength = nTasks/maxSubLengthFactor + 1 #maximum number of tasks assigned to same deadline
+	#print "maxSubLength:" + str(maxSubLength)
+	#print "nTasks:" + str(nTasks)
 	while cursor < nTasks:
 		subset = randint(1,min(maxSubLength,nTasks-cursor))
 		#print subset
@@ -130,7 +130,10 @@ def generate_tasks_handler(req):
 
 	return GetTasksResponse(task_list)	
 
-
+def print_tasks(task_list,cobotid):
+	#print "cobotid,object_id,location,deadline,est_time"
+	for i in xrange(0,len(task_list)):
+		print str(cobotid) + " , " + str(task_list[i].object_id) + " , " + str(task_list[i].location) +  " , " + str(task_list[i].deadline) + " , " + str(task_list[i].est_time)
 
 # if __name__ == '__main__':
 # 	task_lists = []
@@ -148,4 +151,8 @@ def add_two_ints_server():
     rospy.spin()
 
 if __name__ == "__main__":
+	#print "cobotid,object_id,location,deadline,est_time"
+	#for i in xrange(0,10):
+#		task_list = generate_tasks()
+#		print_tasks(task_list,i)
     add_two_ints_server()

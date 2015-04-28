@@ -1,0 +1,4 @@
+<launch>
+  <node name="csp0" pkg="robot_negotiation" type="csp_solver_node" />
+</launch>
+
