@@ -152,8 +152,8 @@ def add_two_ints_server():
     rospy.spin()
 
 if __name__ == "__main__":
-	print "cobotid,object_id,location,deadline,est_time"
-	for i in xrange(0,10):
-		task_list = generate_tasks()
-		print_tasks(task_list,i)
-    #add_two_ints_server()
+	#print "cobotid,object_id,location,deadline,est_time"
+	#for i in xrange(0,10):
+#		task_list = generate_tasks()
+#		print_tasks(task_list,i)
+    add_two_ints_server()
