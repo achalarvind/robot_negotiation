@@ -100,6 +100,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	project_length = 0 #stores minimum time to complete so far
 	nTasks = len(task_list)
 	maxSubLength = nTasks/maxSubLengthFactor + 1 #maximum number of tasks assigned to same deadline
+	maxSubLength = 1
 	#print "maxSubLength:" + str(maxSubLength)
 	#print "nTasks:" + str(nTasks)
 	while cursor < nTasks:
@@ -107,7 +108,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 		#print subset
 		for i in xrange(cursor,cursor+subset):
 			project_length += task_list[i].est_time
-		dl = uniform(project_length,horizon)
+		dl = uniform(project_length,min(project_length+250,horizon))
 		for i in xrange(cursor,cursor+subset):
 			task_list[i].deadline = dl
 		cursor += subset
@@ -151,8 +152,8 @@ def add_two_ints_server():
     rospy.spin()
 
 if __name__ == "__main__":
-	#print "cobotid,object_id,location,deadline,est_time"
-	#for i in xrange(0,10):
-#		task_list = generate_tasks()
-#		print_tasks(task_list,i)
-    add_two_ints_server()
+	print "cobotid,object_id,location,deadline,est_time"
+	for i in xrange(0,10):
+		task_list = generate_tasks()
+		print_tasks(task_list,i)
+    #add_two_ints_server()
