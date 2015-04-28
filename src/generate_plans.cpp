@@ -46,14 +46,12 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 	}	
 
 	time_t now=time(0);
-	std::cout<<now<<"\n";
 	CSPSolver obSolver(req.baxter_location, 0, (double)now+30.0f, pEnv, obGeometry);
 	obSolver.m_d_WorldStartTime=(double)now;
 
 	std::unordered_map<double, std::vector<DeliveryOrderSeq>> umapResults= obSolver.GenerateCobotOrder(vecTasks);
 
 	robot_negotiation::Plan plan;
-	std::cout<<umapResults.size()<<"\n";
 
 	for(std::unordered_map<double, std::vector<DeliveryOrderSeq>> ::iterator it = umapResults.begin() ; it != umapResults.end() ; it++ )
 	{
@@ -67,7 +65,6 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 			task.location = vecPlan[iCount].m_strLoc;
 			task.expected_completion_time = vecPlan[iCount].m_dExpectedTime;
 			plan.plan.push_back(task);
-			std::cout<<" "<<task.cobot_id<<" ";
 		}
 		res.plans.push_back(plan);
 	}
@@ -76,7 +73,7 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 	// {
 	// 	delete (pEnv.at(iCount));
 	// }
-	ROS_INFO("exiting planning function");
+	ROS_INFO("Plans generated. Terminating");
 	return true;
 }
 
