@@ -4,8 +4,11 @@ bool serializeEnvironment(robot_negotiation::SerializeEnvironment::Request  &req
 	robot_negotiation::SerializeEnvironment::Response &res,
 	std::vector<Environment*> pEnv, std::string *file_names){
 	for(int i=0;i<pEnv.size();i++){
+		ROS_INFO("%s",file_names[i].c_str());
 		std::ofstream ofs(file_names[i].c_str(), std::ofstream::out);
+		ROS_INFO("Debug2");
 		boost::archive::text_oarchive oa(ofs);
+		ROS_INFO("Debug3");
 		oa & *(pEnv[i]);
 		ofs.close();
 	}
