@@ -3,3 +3,4 @@ Action[] plan
 float64 start_time
 ---
 Plan[] plans
+float64 greedy_makespan
