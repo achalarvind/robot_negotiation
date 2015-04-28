@@ -108,7 +108,7 @@ public:
 	    double m_d_WorldStartTime;
 	    CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
 
-#ifdef ROS_VERSION	
+#ifdef ROS_CODE	
 		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>);
 #else
 		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>, bool);
