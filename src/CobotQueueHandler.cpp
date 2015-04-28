@@ -18,6 +18,7 @@ cobotQueue::cobotQueue(std::vector<uint> ids, uint maxN)
 	maxNDecisionMakers = maxN;
 }
 
+
 uint cobotQueue::get_queue_size()
 { 
 	return cobotIds.size();
@@ -26,6 +27,8 @@ uint cobotQueue::get_queue_size()
 bool cobotQueue::add_cobot(uint id)
 {
 	cobotIds.push_back(id);
+	ccobot c(id);
+	cobotQueue.push_back(c); //hack
 	return true;
 }
 		
@@ -49,10 +52,44 @@ bool cobotQueue::initiate_vote() // Broadcasts a message to all CoBots in Queue 
 	return false;
 }
 
-std::vector< std::vector<uint> > cobotQueue::collect_votes(uint nPlans) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
+std::vector< std::vector<uint> > cobotQueue::collect_votes(std::vector<std::vector<DeliveryOrderSeq>> plan_list) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
 {
-    std::vector< std::vector<uint> > votesTable;
+    std::vector< std::vector<double> > votesTable;
+    for (int i = 0; i < cobotQueue.size(); i++)
+    {
+    	votesTable.push_back(cobotQueue[i].vote());
+    }
 	return votesTable;
+}
+
+std::vector< std::vector<uint> > cobotQueue::collect_votes(std::vector<robot_negotiation::ResultTasks> plan_list) // Listens to incoming messages and collects votes for all Cobots present in Queue (returns matrix of votes (rows are ranks; cols are voter IDs))
+{
+    std::vector<DeliveryOrderSeq> > Plan;
+    std::vector<std::vector<DeliveryOrderSeq>>> vecPlan;
+
+	int m_iCobotNum;
+	std::string m_strLoc;
+	double m_dExpectedTime;
+	double m_dDeadLine;
+
+    for (int i = 0; i < plan_list.size(); i++)
+    {
+    	Plan.clear();
+
+    	for(int iCount =0 ; iCount < plan_list[i].size() ; iCount++)
+    	{
+    		m_iCobotNum = plan_list[i][iCount].cobot_id;
+    		m_strLoc = plan_list[i][iCount].location;
+    		m_dExpectedTime = plan_list[i][iCount].expected_completion_time;
+    		m_dDeadLine = -1.0;
+
+    		Plan.push_back(DeliveryOrderSeq(m_iCobotNum , m_strLoc , m_dExpectedTime , m_dDeadLine));
+    	}
+
+    	vecPlan.push_back(Plan);
+    }
+
+	return collect_votes(vecPlan);
 }
 
 int cobotQueue::send_best_plan(std::vector< std::vector<uint> > votesTable, uint nPlans) // Evaluates votes and send final plan id to Baxter

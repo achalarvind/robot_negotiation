@@ -82,7 +82,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	while True:
 		# print("distance is",get_distance(int(42),int(waitingNode)))
 
-		object_id = randint(0,nObjects-1)
+		object_id = str(randint(0,nObjects-1))
 		location = vKeys[randint(0,nVertices-1)]
 		#get the estimated task execution time (for now Euclidean distance from reference point
 		distance = getdistance(11,1)
