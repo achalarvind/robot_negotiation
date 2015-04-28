@@ -119,6 +119,7 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 	m_vecTasks.clear();
 	m_vecEnvironments.clear();
 
+	m_d_Greedy_MakeSpan = -1;
 	m_vecTasks = vecCobotTasks;
 	
 	m_vecEnvironments = c_m_vecEnvironments;
@@ -164,6 +165,8 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 		stSol = TraverseGraph(0, m_c_iStartLocation, m_c_dStartTime);
 #endif
 	}
+
+	m_d_Greedy_MakeSpan = m_vecCobotOrder[m_vecCobotOrder.size() - 1].m_dExpectedTime;
 
 	PopulateSequenceInfo();
 
