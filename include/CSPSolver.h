@@ -97,21 +97,24 @@ class CSPSolver
 		void CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrderSeq>* pvecDeliverySequence);
 
 		void PopulateSequenceInfo();
-		void InsertSequenceIntoCandidatePool(double, std::vector<DeliveryOrderSeq>);
+		void InsertSequenceIntoCandidatePool(double, std::vector<DeliveryOrderSeq>*);
 		double ReturnKeyOfBestCandidate();
 		int Return_MCV_Cobot(std::vector<int>* pvecVals);
 		bool CheckIfAllVarsInitialized();
 		std::tuple<double, int, Location> GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock, int iCurr, int iDest , double dCurrTime);
-	
+		double ReturnTimeToPlaceObject(std::string stCobotType , int iTableNum);
 public:
-		double m_d_WorldStartTime;
+	
+	    double m_d_WorldStartTime;
 	    CSPSolver(std::string strStartLoc, double dStartTime, double dTime_Out_1, std::vector<Environment*> , EnvironmentGeometry obGeometry);
 
-#ifdef ROS_CODE	
+#ifdef ROS_VERSION	
 		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>);
 #else
 		std::unordered_map<double, std::vector<DeliveryOrderSeq>> GenerateCobotOrder(std::vector<TaskInfo>, bool);
 #endif
+
+		double ReturnMakeSpanForSchedule(std::vector<DeliveryOrderSeq>* pvecDeliverySequence);
 
 		typedef std::pair<std::pair<int , double>, std::pair<double, Location >> PickUpTime;
 		typedef std::pair<int, std::pair<double, int >> DeliveryTime;
