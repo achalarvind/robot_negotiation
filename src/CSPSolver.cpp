@@ -187,6 +187,27 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 		std::cout<<"Completed 3 opt";
 	}
 
+	if (m_bFeasibility)
+	{
+		InsertSequenceIntoCandidatePool(m_vecCobotOrder[m_vecCobotOrder.size() - 1].m_dExpectedTime, &m_vecCobotOrder);
+	}
+	else
+	{
+		double dFeasibleCobots = 0;
+
+		for (unsigned int iCount = 0; iCount < m_vecCobotOrder.size(); iCount++)
+		{
+			if (m_vecCobotOrder[iCount].m_dExpectedTime <= m_vecCobotOrder[iCount].m_dDeadLine)
+			{
+				dFeasibleCobots = dFeasibleCobots + 1.0;
+			}
+		}
+
+		InsertSequenceIntoCandidatePool(-1 * dFeasibleCobots, &m_vecCobotOrder);
+	}
+
+	//_getch();
+
 	return m_umap_Candidates;
 }
 
