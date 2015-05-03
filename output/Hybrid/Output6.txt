@@ -1,0 +1,29 @@
+[ INFO] [1430254881.541085413]: Environment ready
+[ INFO] [1430254882.736647586]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env
+[ INFO] [1430254882.737811642]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env
+[ INFO] [1430254882.738531922]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env
+
+[ INFO] [1430254883.539540143]: CSP Planner ready
+[ INFO] [1430254884.567644727]: Cobot 0 spawned and tasks list populated
+[ INFO] [1430254884.591826859]: Cobot 1 spawned and tasks list populated
+[ INFO] [1430254884.609347589]: Cobot 2 spawned and tasks list populated
+[ INFO] [1430254884.622806061]: Cobot 3 spawned and tasks list populated
+[ INFO] [1430254884.640112583]: Cobot 4 spawned and tasks list populated
+[ INFO] [1430254884.657895549]: Cobot 5 spawned and tasks list populated
+[ INFO] [1430254884.673738154]: Cobot 6 spawned and tasks list populated
+[ INFO] [1430254884.686075865]: Cobot 7 spawned and tasks list populated
+[ INFO] [1430254884.698688809]: Cobot 8 spawned and tasks list populated
+[ INFO] [1430254884.717196965]: Cobot 9 spawned and tasks list populated
+Entered 3 optCompleted 3 opt5
+[ INFO] [1430254888.296769066]: Plans generated. Terminating, Number of Plans generated
+[ INFO] [1430254888.297049245]: Makespan of greedy approach is 287.430286
+[ INFO] [1430254888.297112245]: Makespan of schedule 0 is 237.430286
+[ INFO] [1430254888.297158181]: Makespan of schedule 1 is 237.430286
+[ INFO] [1430254888.297221934]: Makespan of schedule 2 is 237.430286
+[ INFO] [1430254888.297303245]: Makespan of schedule 3 is 237.430286
+[ INFO] [1430254888.297379805]: Makespan of schedule 4 is 237.430286
+[ INFO] [1430254888.297453013]: Starting the voting process
+1.4,1.5,1.4,1.5,1.5,
+Was there a tie?:1
+[ INFO] [1430254888.298228037]: Makespan of negotiated schedule is 237.430286
+[ INFO] [1430254888.298260986]: Vote Result-Best plan: 0

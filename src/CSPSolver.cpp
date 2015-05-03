@@ -26,19 +26,21 @@ bool MCV_Deadline_Heurisitc(TaskInfo obTask1, TaskInfo obTask2)
 	return (obTask1.m_dTaskDeadline < obTask2.m_dTaskDeadline);
 }
 
-TaskInfo::TaskInfo(double dEndTime, Block obBlock, int iCobotNum)
+TaskInfo::TaskInfo(double dEndTime, Block obBlock, int iCobotNum , std::string strCobotType)
 {
 	m_dTaskDeadline = dEndTime;
 	m_obBlock =obBlock;
 	m_iCobotNum = iCobotNum;
+	m_str_cobot_type = strCobotType;
 }
 
-DeliveryOrderSeq::DeliveryOrderSeq(int iCobotNum, std::string strLoc, double dTime, double dDeadLine)
+DeliveryOrderSeq::DeliveryOrderSeq(int iCobotNum, std::string strLoc, double dTime, double dDeadLine , std::string strType)
 {
 	m_iCobotNum = iCobotNum;
 	m_strLoc = strLoc;
 	m_dExpectedTime = dTime;
 	m_dDeadLine = dDeadLine;
+	m_str_cobot_type = strType;
 }
 
 void DeliveryOrderSeq::set(DeliveryOrderSeq a)
@@ -47,10 +49,11 @@ void DeliveryOrderSeq::set(DeliveryOrderSeq a)
 	m_strLoc = a.m_strLoc;
 	m_dExpectedTime = a.m_dExpectedTime ;
 	m_dDeadLine = a.m_dDeadLine ;	
+	m_str_cobot_type = a.m_str_cobot_type;
 }
 
 
-CompleteSeqInfo::CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock)
+CompleteSeqInfo::CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock , std::string str_cobot_type)
 {
 	m_iCobotNum = iCobotNum;
 	m_iObjectPickUpLocation = iPickUp;
@@ -58,6 +61,7 @@ CompleteSeqInfo::CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, doubl
 	m_dDeadline = dDeadLine;
 	m_dPickUpTime = dPickUpTime;
 	m_obBlock = obBlock;
+	m_str_cobot_type = str_cobot_type;
 }
 
 PickUpOrderSeqInfo::PickUpOrderSeqInfo(int iTableNum, Location stLoc, std::string strObjName, double dTime, Block obBlock)
@@ -150,6 +154,13 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 
 	if (false == stSol.first)
 	{
+
+		if(SOLUTION::INFEASIBLE == stSol.second)
+		{
+			std::cout<<"Objects not present";
+			return m_umap_Candidates;
+		}
+
 		m_bFeasibility = false;
 
 		//Initialize variables
@@ -171,7 +182,9 @@ std::unordered_map<double, std::vector<DeliveryOrderSeq>> CSPSolver::GenerateCob
 
 	if (true == stSol.first)
 	{
+		std::cout<<"Entered 3 opt";
 		Perform3Swap();
+		std::cout<<"Completed 3 opt";
 	}
 
 	return m_umap_Candidates;
@@ -353,7 +366,7 @@ std::pair<bool, SOLUTION> CSPSolver::SelectDeliveryLocation(int iCobotIndex, int
 	{
 		dDistance_To_Table = m_obGeometry.ReturnTravDistance(iPickUpLocation, iDeliveryLocation);
 		dTime_To_Table = dDistance_To_Table / BAXTER_TRAV_SPEED;
-		dTime_To_Table = dTime_To_Table + TIME_TO_PLACE_OBJECT;
+		dTime_To_Table = dTime_To_Table + ReturnTimeToPlaceObject(m_vecTasks[iCobotIndex].m_str_cobot_type , iDeliveryLocation);
 
 		vecDeliveryLocations.push_back(std::make_pair(iPickUpLocation, std::make_pair(dCurrentTime + dTime_To_Table, iDeliveryLocation)));
 	}
@@ -377,7 +390,7 @@ std::pair<bool, SOLUTION> CSPSolver::SelectDeliveryLocation(int iCobotIndex, int
 		std::string stDropOffLoc = ReturnDropOfLocation(iDropOffLoc);
 		double dTimeDelivery = vecDeliveryLocations[iCount].second.first;		
 
-		m_vecCobotOrder.push_back(DeliveryOrderSeq(m_vecTasks[iCobotIndex].m_iCobotNum, stDropOffLoc, dTimeDelivery, dDeadline));
+		m_vecCobotOrder.push_back(DeliveryOrderSeq(m_vecTasks[iCobotIndex].m_iCobotNum, stDropOffLoc, dTimeDelivery, dDeadline, m_vecTasks[iCobotIndex].m_str_cobot_type));
 
 #ifdef LARGE_TREE
 		stSol = SelectNode(iDropOffLoc, dTimeDelivery);
@@ -438,9 +451,9 @@ void CSPSolver::Perform3Swap()
 	unsigned int iMaxIterations;
 	double dBestSol;
 
-	if (iNumOfCobots > 15)
+	if (iNumOfCobots > 5)
 	{
-		iMaxIterations = 1000;
+		iMaxIterations = 500;
 	}
 	else if (iNumOfCobots == 2)
 	{
@@ -491,10 +504,12 @@ void CSPSolver::PopulateSequenceInfo()
 	int iCobotNum, iPickUp, iDropOff; 
 	double dDeadLine , dPickUpTime;
 	Block obBlock;
+	std::string strCobotType;
 
 	for (unsigned int iCount = 0; iCount < m_vecCobotOrder.size(); iCount++)
 	{
 		iCobotNum = m_vecCobotOrder[iCount].m_iCobotNum;
+		strCobotType = m_vecCobotOrder[iCount].m_str_cobot_type;
 		iDropOff = ReturnDropOfLocation(m_vecCobotOrder[iCount].m_strLoc);
 		dDeadLine = m_vecCobotOrder[iCount].m_dDeadLine;
 
@@ -502,7 +517,7 @@ void CSPSolver::PopulateSequenceInfo()
 		dPickUpTime = m_vecPickUpObjectOrder[iCount].m_dPickUpTime;
 		obBlock = m_vecPickUpObjectOrder[iCount].m_obBlock;
 
-		m_umapCompleteSeqInfo.insert(std::make_pair(iCobotNum, CompleteSeqInfo(iCobotNum, iPickUp, iDropOff, dDeadLine, dPickUpTime, obBlock)));
+		m_umapCompleteSeqInfo.insert(std::make_pair(iCobotNum, CompleteSeqInfo(iCobotNum, iPickUp, iDropOff, dDeadLine, dPickUpTime, obBlock , strCobotType)));
 	}
 }
 
@@ -604,7 +619,8 @@ void CSPSolver::CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrder
 
 			for (int iDest = 0; iDest < 3; iDest++)
 			{
-				stResult = GetPairWiseShortestCosts(&vecEnv, it->second.m_obBlock, iStart, iDest, dCurrTime);
+
+				stResult = GetPairWiseShortestCosts(&vecEnv, it->second.m_obBlock, iStart, iDest, dCurrTime , it->second.m_str_cobot_type);
 				std::get<0>(stResult) = std::get<0>(stResult) +dTravCost;
 
 				if (std::get<0>(stBestResult) > std::get<0>(stResult))
@@ -646,7 +662,7 @@ void CSPSolver::CheckForLocalImprovementGreedyStartegy(std::vector<DeliveryOrder
 	}
 }
 
-std::tuple<double , int , Location> CSPSolver::GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock , int iCurr , int iDest , double dCurrTime)
+std::tuple<double , int , Location> CSPSolver::GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock , int iCurr , int iDest , double dCurrTime , std::string strCobotType)
 {
 	Location stLoc;
 	std::tuple<double, int , Location> stResult = std::make_tuple(MAX_DIST_VALUE, -1, stLoc);
@@ -670,7 +686,7 @@ std::tuple<double , int , Location> CSPSolver::GetPairWiseShortestCosts(std::vec
 		}
 
 		dTime = dTime + dTime_At_Table;
-		dTime = dTime + TIME_TO_PLACE_OBJECT;
+		dTime = dTime + ReturnTimeToPlaceObject(strCobotType , iTable);
 
 		dTableToDest = m_obGeometry.ReturnTravDistance(iTable, iDest);
 		dTime = dTime + (dTableToDest / BAXTER_TRAV_SPEED);		
@@ -714,7 +730,7 @@ double CSPSolver::ReturnMakeSpanForSchedule(std::vector<DeliveryOrderSeq>* pvecD
 
 			for (int iDest = 0; iDest < 3; iDest++)
 			{
-				stResult = GetPairWiseShortestCosts(&vecEnv, it->second.m_obBlock, iStart, iDest, dCurrTime);
+				stResult = GetPairWiseShortestCosts(&vecEnv, it->second.m_obBlock, iStart, iDest, dCurrTime , it->second.m_str_cobot_type);
 				std::get<0>(stResult) = std::get<0>(stResult) +dTravCost;
 
 				if (std::get<0>(stBestResult) > std::get<0>(stResult))

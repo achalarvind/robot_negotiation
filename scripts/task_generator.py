@@ -77,7 +77,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 
 
 	objects=["A","B","C"]
-
+	
 	totalTime = 0
 	task_list = []
 
@@ -102,7 +102,7 @@ def generate_tasks(): #generates a list of tasks for one Cobot which contains ob
 	project_length = 0 #stores minimum time to complete so far
 	nTasks = len(task_list)
 	maxSubLength = nTasks/maxSubLengthFactor + 1 #maximum number of tasks assigned to same deadline
-	maxSubLength = 1
+	maxSubLength = randint(1,5)
 	#print "maxSubLength:" + str(maxSubLength)
 	#print "nTasks:" + str(nTasks)
 	while cursor < nTasks:

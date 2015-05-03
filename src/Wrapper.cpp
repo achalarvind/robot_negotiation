@@ -56,13 +56,13 @@ int main(int argc, char** argv)
 
 	std::ifstream stVtxPath;
 	// stVtxPath.open("../../../src/robot_negotiation/data_files/MapVertices.txt");
-	 stVtxPath.open("/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/MapVertices.txt");
-	//stVtxPath.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapVertices.txt");
+	 // stVtxPath.open("/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/MapVertices.txt");
+	stVtxPath.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapVertices.txt");
 
 	std::ifstream stEdges;
 	// stEdges.open("../../../src/robot_negotiation/data_files/MapEdges.txt");
-	 stEdges.open("/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/MapEdges.txt");
-	//stEdges.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapEdges.txt");
+	 // stEdges.open("/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/MapEdges.txt");
+	stEdges.open("/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/MapEdges.txt");
 	
 
 	WorldMap *pWorld = new WorldMap(stVtxPath, stEdges);

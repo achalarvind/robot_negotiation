@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "../include/CobotQueueHandler.h"
+#include <chrono>
 #include <algorithm>
 
 double variance(std::vector<double> x,double mean)
@@ -31,8 +32,12 @@ uint cobotQueue::get_queue_size()
 		
 bool cobotQueue::add_cobot(uint id)
 {
+	time_t t;
+	srand((unsigned)time(&t));
+
+	std::string vecCobotType[] = {"SMALL" , "MEDIUM" , "LARGE"};  
 	cobotIds.push_back(id);
-	ccobot c(id);
+	ccobot c(id , vecCobotType[rand() % (sizeof(vecCobotType)/sizeof(std::string)) ]);
 	cobots.push_back(c); //hack
 	return true;
 }
@@ -76,6 +81,7 @@ std::vector< std::vector<double> > cobotQueue::collect_votes(std::vector<std::ve
 	std::string m_strLoc;
 	double m_dExpectedTime;
 	double m_dDeadLine;
+	std::string m_str_cobot_type;
 
     for (int i = 0; i < plan_list.size(); i++)
     {
@@ -87,8 +93,9 @@ std::vector< std::vector<double> > cobotQueue::collect_votes(std::vector<std::ve
     		m_strLoc = plan_list[i][iCount].location;
     		m_dExpectedTime = plan_list[i][iCount].expected_completion_time;
     		m_dDeadLine = -1.0;
+    		m_str_cobot_type = "INVALID";
 
-    		Plan.push_back(DeliveryOrderSeq(m_iCobotNum , m_strLoc , m_dExpectedTime , m_dDeadLine));
+    		Plan.push_back(DeliveryOrderSeq(m_iCobotNum , m_strLoc , m_dExpectedTime , m_dDeadLine, m_str_cobot_type));
     	}
 
     	vecPlan.push_back(Plan);
@@ -106,6 +113,7 @@ int cobotQueue::send_best_plan(std::vector< std::vector<double> > votesTable, ui
 	double min_cost = std::numeric_limits<double>::infinity();
 	double min_cost_std = 0;
  	int best_plan = -1;
+ 	bool tie = false;
 	row_av = new double[nPlans];
 	row_var = new double[nPlans];
  	for(int plan = 0; plan < votesTable.size(); plan++)
@@ -118,11 +126,15 @@ int cobotQueue::send_best_plan(std::vector< std::vector<double> > votesTable, ui
  		}
 		row_av[plan] = row_av[plan]/votesTable[plan].size();
 		row_var[plan] = variance(votesTable[plan],row_av[plan]);
-		if(row_av[plan]<min_cost){min_cost = row_av[plan]; best_plan = plan; min_cost_std=row_var[plan];}
-		if(row_av[plan] == min_cost && min_cost_std < row_var[plan]){best_plan = plan; min_cost_std=row_var[plan];}
+		if(row_av[plan]<min_cost){min_cost = row_av[plan]; best_plan = plan; min_cost_std=row_var[plan];tie = false;}
+		else if(row_av[plan] == min_cost){
+			tie = true;
+		 	if(min_cost_std < row_var[plan]){best_plan = plan; min_cost_std=row_var[plan];}
+		}
+		std::cout<<row_av[plan]<<",";
 		//std::cout<<(boost::lexical_cast<std::string>(row_av[plan]))<<std::endl;
- 	} 
-	
+ 	}
+	std::cout<<"\nWas there a tie?:"<<tie<<"\n";
 	return best_plan;
 }
 

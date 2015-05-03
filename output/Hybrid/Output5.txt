@@ -1,0 +1,23 @@
+[ INFO] [1430254722.055021165]: Cobot 0 spawned and tasks list populated
+[ INFO] [1430254722.088950027]: Cobot 1 spawned and tasks list populated
+[ INFO] [1430254722.112080338]: Cobot 2 spawned and tasks list populated
+[ INFO] [1430254722.137131890]: Cobot 3 spawned and tasks list populated
+[ INFO] [1430254722.158958209]: Cobot 4 spawned and tasks list populated
+[ INFO] [1430254722.178294517]: Cobot 5 spawned and tasks list populated
+[ INFO] [1430254722.196230160]: Cobot 6 spawned and tasks list populated
+[ INFO] [1430254722.214807322]: Cobot 7 spawned and tasks list populated
+[ INFO] [1430254722.235008914]: Cobot 8 spawned and tasks list populated
+[ INFO] [1430254722.253722363]: Cobot 9 spawned and tasks list populated
+Entered 3 optCompleted 3 opt5
+[ INFO] [1430254798.651112909]: Plans generated. Terminating, Number of Plans generated
+[ INFO] [1430254798.651401554]: Makespan of greedy approach is 265.536887
+[ INFO] [1430254798.651430617]: Makespan of schedule 0 is 375.536887
+[ INFO] [1430254798.651449643]: Makespan of schedule 1 is 375.536887
+[ INFO] [1430254798.651467333]: Makespan of schedule 2 is 202.426406
+[ INFO] [1430254798.651502197]: Makespan of schedule 3 is 242.426406
+[ INFO] [1430254798.651525795]: Makespan of schedule 4 is 375.536887
+[ INFO] [1430254798.651590713]: Starting the voting process
+2.8,2.6,2,2.1,2.7,
+Was there a tie?:0
+[ INFO] [1430254798.651952231]: Makespan of negotiated schedule is 202.426406
+[ INFO] [1430254798.651966086]: Vote Result-Best plan: 2

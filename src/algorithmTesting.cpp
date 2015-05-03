@@ -46,8 +46,9 @@ int main(int argc, char** argv)
         {
         	robot_negotiation::Action a;
         	a.cobot_id = i;
+            a.cobot_type = queue.cobots[i].m_str_type;
         	a.object_type = queue.cobots[i].tasks.task_list[0].object_id;
-        	a.deadline = queue.cobots[i].tasks.task_list[0].deadline;
+        	a.deadline = queue.cobots[i].tasks.task_list[0].deadline - queue.cobots[i].tasks.task_list[0].est_time;
         	srv_planning.request.plan.push_back(a);
         }
         srv_planning.request.baxter_location=baxter_location;
@@ -55,17 +56,18 @@ int main(int argc, char** argv)
 
         if (planning_client.call(srv_planning))
         {
-            ROS_INFO("CSP solver called and plans generated");
             
             std::vector<std::vector<DeliveryOrderSeq>> plans; 
             std::vector<DeliveryOrderSeq> plan;
+            ROS_INFO("Makespan of greedy approach is %f",srv_planning.response.greedy_makespan);
 
             for(int j = 0; j < srv_planning.response.plans.size(); j++)
             {
+                ROS_INFO("Makespan of schedule %d is %f",j,srv_planning.response.plans[j].plan[srv_planning.response.plans[j].plan.size()-1].expected_completion_time);
                 plan.clear();
                 for(int k = 0; k < srv_planning.response.plans[j].plan.size(); k++)
                 {
-                    DeliveryOrderSeq a(srv_planning.response.plans[j].plan[k].cobot_id, srv_planning.response.plans[j].plan[k].location, srv_planning.response.plans[j].plan[k].expected_completion_time, 0.0f);
+                    DeliveryOrderSeq a(srv_planning.response.plans[j].plan[k].cobot_id, srv_planning.response.plans[j].plan[k].location, srv_planning.response.plans[j].plan[k].expected_completion_time, 0.0f , "INVALID");
                     plan.push_back(a);
                 }       
                 plans.push_back(plan);
@@ -90,8 +92,9 @@ int main(int argc, char** argv)
                     voteResult_t[j][i] = voteResult[i][j];
                 }
             }
-
-            ROS_INFO("Vote Result-Best plan: %d",queue.send_best_plan(voteResult_t, voteResult_t.size()));
+            int best_plan=queue.send_best_plan(voteResult_t, voteResult_t.size());
+            ROS_INFO("Makespan of negotiated schedule is %f",srv_planning.response.plans[best_plan].plan[srv_planning.response.plans[best_plan].plan.size()-1].expected_completion_time);
+            ROS_INFO("Vote Result-Best plan: %d",best_plan);
 
         }
         else

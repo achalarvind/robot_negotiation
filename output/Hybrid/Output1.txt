@@ -1,0 +1,34 @@
+[ INFO] [1430253954.574758691]: started_node
+/usr0/home/aarvind/catkin_ws/src/robot_negotiation/scripts/../data_files
+/usr0/home/aarvind/catkin_ws/src/robot_negotiation/scripts/../data_files/MapVertices.dat
+Loaded MapVertices.dat
+Loaded objects.txt
+Ready to generate tasks
+[ INFO] [1430253956.512380600]: Environment ready
+[ INFO] [1430253957.715507507]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env
+[ INFO] [1430253957.716679656]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env
+[ INFO] [1430253957.717386863]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env
+
+[ INFO] [1430253958.541186641]: CSP Planner ready
+[ INFO] [1430253959.553660470]: Cobot 0 spawned and tasks list populated
+[ INFO] [1430253959.567661226]: Cobot 1 spawned and tasks list populated
+[ INFO] [1430253959.583324011]: Cobot 2 spawned and tasks list populated
+[ INFO] [1430253959.602845429]: Cobot 3 spawned and tasks list populated
+[ INFO] [1430253959.622170852]: Cobot 4 spawned and tasks list populated
+[ INFO] [1430253959.640636092]: Cobot 5 spawned and tasks list populated
+[ INFO] [1430253959.662356276]: Cobot 6 spawned and tasks list populated
+[ INFO] [1430253959.681395854]: Cobot 7 spawned and tasks list populated
+[ INFO] [1430253959.696672401]: Cobot 8 spawned and tasks list populated
+[ INFO] [1430253959.710447630]: Cobot 9 spawned and tasks list populated
+Entered 3 optCompleted 3 opt[ INFO] [1430253964.453594772]: Plans generated. Terminating
+[ INFO] [1430253964.453820532]: Makespan of greedy approach is 377.430286
+[ INFO] [1430253964.453870908]: Makespan of schedule 0 is 355.536887
+[ INFO] [1430253964.453914483]: Makespan of schedule 1 is 297.430286
+[ INFO] [1430253964.453960973]: Makespan of schedule 2 is 297.430286
+[ INFO] [1430253964.454002474]: Makespan of schedule 3 is 307.430286
+[ INFO] [1430253964.454015142]: Makespan of schedule 4 is 307.430286
+[ INFO] [1430253964.454029254]: Starting the voting process
+2.4,2,2,2.2,2.5,
+Was there a tie?:1
+[ INFO] [1430253964.454623358]: Makespan of negotiated schedule is 297.430286
+[ INFO] [1430253964.454654629]: Vote Result-Best plan: 1

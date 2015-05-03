@@ -42,7 +42,7 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 	for(int iCount = 0; iCount < req.plan.size() ; iCount++)
 	{
 		Block obBlock(req.plan[iCount].object_type, 10, rand()%1000);
-		vecTasks.push_back(TaskInfo(req.plan[iCount].deadline, obBlock, req.plan[iCount].cobot_id));
+		vecTasks.push_back(TaskInfo(req.plan[iCount].deadline, obBlock, req.plan[iCount].cobot_id , req.plan[iCount].cobot_type ));
 	}	
 
 	time_t now=time(0);
@@ -53,8 +53,8 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 	res.greedy_makespan=obSolver.m_d_Greedy_MakeSpan;
 
 	robot_negotiation::Plan plan;
-
-	for(std::unordered_map<double, std::vector<DeliveryOrderSeq>> ::iterator it = umapResults.begin() ; it != umapResults.end() ; it++ )
+    
+   for(std::unordered_map<double, std::vector<DeliveryOrderSeq>> ::iterator it = umapResults.begin() ; it != umapResults.end() ; it++ )
 	{
 	    std::vector<DeliveryOrderSeq> vecPlan = it->second;
 	    plan.plan.clear();
@@ -74,7 +74,9 @@ bool deserializeEnvironment(robot_negotiation::DeSerializeEnvironmentPlan::Reque
 	// {
 	// 	delete (pEnv.at(iCount));
 	// }
-	ROS_INFO("Plans generated. Terminating");
+
+	std::cout<< umapResults.size() << "\n";
+	ROS_INFO("Plans generated. Terminating, Number of Plans generated");
 	return true;
 }
 
@@ -85,8 +87,8 @@ int main(int argc, char **argv){
 	ROS_INFO("CSP Planner ready");
 
 
-	std::string filenames[]={"/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table0.env","/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table1.env","/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table2.env"};
-	//std::string filenames[]={"/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env"};
+	// std::string filenames[]={"/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table0.env","/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table1.env","/home/kim/Desktop/Grad_AI/src/robot_negotiation/data_files/table2.env"};
+	std::string filenames[]={"/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env","/usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env"};
 
 	ros::ServiceServer deserialize_environment_plan = n.advertiseService<robot_negotiation::DeSerializeEnvironmentPlan::Request, robot_negotiation::DeSerializeEnvironmentPlan::Response>("deserialize_environment", boost::bind(deserializeEnvironment, _1, _2, filenames));
 	

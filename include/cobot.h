@@ -17,9 +17,9 @@ class ccobot{
 		int location;
 		bool has_object;
 
-
 	public:
-		ccobot(uint cobotId);
+		ccobot(uint cobotId , std::string);
+		std::string m_str_type;
 
 		robot_negotiation::TaskList tasks;
 		std::vector<double> vote(std::vector<std::vector<DeliveryOrderSeq>> plan_list);

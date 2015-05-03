@@ -1,0 +1,41 @@
+[ WARN] [1430254249.247899539]: Shutdown request received.
+[ WARN] [1430254249.247963564]: Reason given for shutdown: [new node registered with same name]
+[ INFO] [1430254249.363987160]: started_node
+/usr0/home/aarvind/catkin_ws/src/robot_negotiation/scripts/../data_files
+/usr0/home/aarvind/catkin_ws/src/robot_negotiation/scripts/../data_files/MapVertices.dat
+Loaded MapVertices.dat
+Loaded objects.txt
+Ready to generate tasks
+shutdown request: new node registered with same name
+[ INFO] [1430254251.260947814]: Environment ready
+[ WARN] [1430254251.293257015]: Shutdown request received.
+[ WARN] [1430254251.293318929]: Reason given for shutdown: [new node registered with same name]
+[ INFO] [1430254252.448767958]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table0.env
+[ INFO] [1430254252.449873069]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table1.env
+[ INFO] [1430254252.450445640]: Created /usr0/home/aarvind/catkin_ws/src/robot_negotiation/data_files/table2.env
+
+[ INFO] [1430254253.257984343]: CSP Planner ready
+[ WARN] [1430254253.301093586]: Shutdown request received.
+[ WARN] [1430254253.301157302]: Reason given for shutdown: [new node registered with same name]
+[ INFO] [1430254254.258203520]: Cobot 0 spawned and tasks list populated
+[ INFO] [1430254254.274121398]: Cobot 1 spawned and tasks list populated
+[ INFO] [1430254254.288629315]: Cobot 2 spawned and tasks list populated
+[ INFO] [1430254254.310264932]: Cobot 3 spawned and tasks list populated
+[ INFO] [1430254254.333639474]: Cobot 4 spawned and tasks list populated
+[ INFO] [1430254254.346258316]: Cobot 5 spawned and tasks list populated
+[ INFO] [1430254254.361525957]: Cobot 6 spawned and tasks list populated
+[ INFO] [1430254254.378321193]: Cobot 7 spawned and tasks list populated
+[ INFO] [1430254254.400248702]: Cobot 8 spawned and tasks list populated
+[ INFO] [1430254254.413319961]: Cobot 9 spawned and tasks list populated
+Entered 3 optCompleted 3 opt[ INFO] [1430254259.645933319]: Plans generated. Terminating
+[ INFO] [1430254259.646200773]: Makespan of greedy approach is 300.536887
+[ INFO] [1430254259.646242076]: Makespan of schedule 0 is 300.536887
+[ INFO] [1430254259.646281559]: Makespan of schedule 1 is 300.536887
+[ INFO] [1430254259.646311449]: Makespan of schedule 2 is 250.536887
+[ INFO] [1430254259.646333958]: Makespan of schedule 3 is 290.536887
+[ INFO] [1430254259.646353932]: Makespan of schedule 4 is 300.536887
+[ INFO] [1430254259.646374892]: Starting the voting process
+2.6,2.4,2.5,2.6,2.6,
+Was there a tie?:0
+[ INFO] [1430254259.646725682]: Makespan of negotiated schedule is 300.536887
+[ INFO] [1430254259.646742942]: Vote Result-Best plan: 1

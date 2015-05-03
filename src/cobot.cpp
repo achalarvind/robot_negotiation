@@ -1,8 +1,10 @@
 #include <cobot.h>
 #include <CSPSolver.h>
 
-ccobot::ccobot(uint cobotId){
+ccobot::ccobot(uint cobotId , std::string strType){
 	id = cobotId;
+	m_str_type = strType;
+
 	task_client = nh.serviceClient<robot_negotiation::GetTasks>("/task_generator");
 	if (task_client.call(srv))
 	{
@@ -53,7 +55,7 @@ double ccobot::plan_cost(std::vector<DeliveryOrderSeq> plan)
 {
 
 	std::string s;
-	DeliveryOrderSeq a(0,s,0,0);
+	DeliveryOrderSeq a(0,s,0,0, "INVALID");
 	for(int i =0; i < plan.size(); i++)
 	{
 		if(plan[i].m_iCobotNum == id) {a = plan[i];  break;}

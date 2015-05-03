@@ -18,8 +18,9 @@ class TaskInfo
 		double m_dTaskDeadline;
 		Block m_obBlock;
 		int m_iCobotNum;
+		std::string m_str_cobot_type;
 
-		TaskInfo(double, Block, int);
+		TaskInfo(double, Block, int , std::string);
 };
 
 enum class SOLUTION
@@ -34,8 +35,10 @@ class DeliveryOrderSeq
 		std::string m_strLoc;
 		double m_dExpectedTime;
 		double m_dDeadLine;
-	
-		DeliveryOrderSeq(int, std::string, double, double);
+		std::string m_str_cobot_type;
+
+		void set(DeliveryOrderSeq);
+		DeliveryOrderSeq(int, std::string, double, double , std::string);
 };
 
 class PickUpOrderSeqInfo
@@ -59,8 +62,9 @@ class CompleteSeqInfo
 		double m_dPickUpTime;
 		double m_dDeadline;
 		Block m_obBlock;
+		std::string m_str_cobot_type;
 
-		CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock);
+		CompleteSeqInfo(int iCobotNum, int iPickUp, int iDropOff, double dDeadLine, double dPickUpTime, Block obBlock, std::string str_cobot_type);
 };
 
 class CSPSolver
@@ -100,7 +104,7 @@ class CSPSolver
 		double ReturnKeyOfBestCandidate();
 		int Return_MCV_Cobot(std::vector<int>* pvecVals);
 		bool CheckIfAllVarsInitialized();
-		std::tuple<double, int, Location> GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock, int iCurr, int iDest , double dCurrTime);
+		std::tuple<double, int, Location> GetPairWiseShortestCosts(std::vector<Environment>* pvecEnvVars, Block obBlock, int iCurr, int iDest , double dCurrTime , std::string strCobotType);
 		double ReturnTimeToPlaceObject(std::string stCobotType , int iTableNum);
 public:
 	
